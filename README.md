@@ -1,2 +1,2 @@
-# crud-compra-venda-imaveis
+# crud-compra-venda-imoveis
 Trabalho de Desenvolvimento WEB 1
