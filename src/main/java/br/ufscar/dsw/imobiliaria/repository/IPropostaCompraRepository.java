@@ -12,6 +12,9 @@ public interface PropostaCompraRepository extends JpaRepository<PropostaCompra, 
     @Query("SELECT p FROM PropostaCompra p WHERE p.cliente.id = :clienteId")
     List<PropostaCompra> findByClienteId(Long clienteId);
 
+    @Query("SELECT p FROM PropostaCompra p WHERE p.cliente.id = :clienteId AND p.status = :status")
+    List<PropostaCompra> findByClienteIdAndStatus(Long clienteId, StatusProposta status);
+
     @Query("SELECT p FROM PropostaCompra p INNER JOIN p.imovel i WHERE i.imobiliaria.id = :imobiliariaId")
     List<PropostaCompra> findByImovelImobiliariaId(Long imobiliariaId);
 

@@ -20,7 +20,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 
-// R1: Cliente
 @Entity
 @Table(name = "clientes", uniqueConstraints = {
         @UniqueConstraint(columnNames = "email"),

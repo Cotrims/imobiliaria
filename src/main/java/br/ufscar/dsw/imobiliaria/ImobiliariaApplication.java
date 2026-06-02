@@ -30,6 +30,8 @@ public class ImobiliariaApplication {
 		return args -> {
 			System.out.println("===== INICIANDO EXEMPLOS DE CRUD =====");
 
+			// R1: Cliente com as informações do documento de requisitos
+
 			/*
 			 * CREATE - Criando cliente
 			 */
@@ -45,6 +47,8 @@ public class ImobiliariaApplication {
 			cliente = clienteRepository.save(cliente);
 			System.out.println("Cliente criado: " + cliente.getNome());
 
+			// R2: Imobiliária e imóvel com as informações do documento de requisitos
+
 			/*
 			 * CREATE - Criando imobiliária
 			 */
@@ -58,6 +62,9 @@ public class ImobiliariaApplication {
 			imobiliaria = imobiliariaRepository.save(imobiliaria);
 			System.out.println("Imobiliária criada: " + imobiliaria.getNome());
 
+			// R3: Cadastro de imóvel de acordo com as informações do documento de
+			// requisitos, incluindo o limite de 10 fotos por imóvel
+
 			/*
 			 * CREATE - Criando imóvel
 			 */
@@ -68,11 +75,28 @@ public class ImobiliariaApplication {
 					new BigDecimal("450000.00"),
 					imobiliaria);
 
+			// R3: Adicionando fotos ao imóvel, respeitando o limite de 10 fotos
+
 			imovel.adicionarFoto(new FotoImovel("/imagens/casa-1.jpg"));
 			imovel.adicionarFoto(new FotoImovel("/imagens/casa-2.jpg"));
 
 			imovel = imovelRepository.save(imovel);
 			System.out.println("Imóvel criado na cidade: " + imovel.getCidade());
+
+			// R4: Listagem de todos os imóveis disponíveis para venda
+
+			/*
+			 * READ - Listando imóveis
+			 */
+			System.out.println("\nImoveis cadastrados:");
+			List<Imovel> imoveis = imovelRepository.findAll();
+
+			for (Imovel i : imoveis) {
+				System.out.println(i.getId() + " - " + i.getEndereco() + " - R$ " + i.getValor());
+			}
+
+			// R5: Cadastro de proposta de compra para um imóvel específico, associando-a a
+			// um cliente e ao imóvel
 
 			/*
 			 * CREATE - Criando proposta de compra
@@ -86,24 +110,32 @@ public class ImobiliariaApplication {
 			proposta = propostaCompraRepository.save(proposta);
 			System.out.println("Proposta criada com status: " + proposta.getStatus());
 
-			/*
-			 * READ - Listando clientes
-			 */
-			System.out.println("\nClientes cadastrados:");
-			List<Cliente> clientes = clienteRepository.findAll();
+			// R6: Listagem de todos os imóveis de uma imobiliária específica
 
-			for (Cliente c : clientes) {
-				System.out.println(c.getId() + " - " + c.getNome() + " - " + c.getEmail());
+			/*
+			 * READ - Listando imóveis da imobiliária
+			 */
+			System.out.println("\nImóveis da imobiliária:");
+			List<Imovel> imoveisImobiliaria = imovelRepository.findByImobiliaria(imobiliaria);
+
+			for (Imovel i : imoveisImobiliaria) {
+				System.out.println(i.getId() + " - " + i.getEndereco() + " - R$ " + i.getValor());
 			}
 
-			/*
-			 * READ - Buscando imóveis por cidade
-			 */
-			System.out.println("\nImóveis em São Carlos:");
-			List<Imovel> imoveisSaoCarlos = imovelRepository.findByCidadeIgnoreCase("São Carlos");
+			// R7: Listagem de todas as propostas de compra para um imóvel específico
 
-			for (Imovel i : imoveisSaoCarlos) {
-				System.out.println(i.getId() + " - " + i.getEndereco() + " - R$ " + i.getValor());
+			/*
+			 * READ - Listando propostas de um usuário por status
+			 */
+
+			System.out.println("\nPropostas para de um usuário por status: " + cliente.getNome() + " - "
+					+ StatusProposta.ACEITO);
+
+			List<PropostaCompra> propostasUsuario = propostaCompraRepository.findByClienteAndStatus(cliente,
+					StatusProposta.ACEITO);
+
+			for (PropostaCompra p : propostasUsuario) {
+				System.out.println(p.getId() + " - " + p.getValorProposta() + " - " + p.getStatus());
 			}
 
 			/*
