@@ -134,14 +134,6 @@ public class ImobiliariaApplication {
 			imovelRepository.delete(imovel);
 			System.out.println("Imóvel removido.");
 
-			/*
-			 * DELETE - Removendo cliente e imobiliária
-			 */
-			clienteRepository.delete(cliente);
-			imobiliariaRepository.delete(imobiliaria);
-
-			System.out.println("Cliente e imobiliária removidos.");
-			System.out.println("===== FIM DOS EXEMPLOS DE CRUD =====");
 		};
 	}
 }
