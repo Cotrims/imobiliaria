@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface PropostaCompraRepository extends JpaRepository<PropostaCompra, Long> {
+public interface IPropostaCompraRepository extends JpaRepository<PropostaCompra, Long> {
 
     @Query("SELECT p FROM PropostaCompra p WHERE p.cliente.id = :clienteId")
     List<PropostaCompra> findByClienteId(Long clienteId);

@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface ImobiliariaRepository extends JpaRepository<Imobiliaria, Long> {
+public interface IImobiliariaRepository extends JpaRepository<Imobiliaria, Long> {
 
     @Query("SELECT i FROM Imobiliaria i WHERE i.email = :email")
     Optional<Imobiliaria> findByEmail(String email);

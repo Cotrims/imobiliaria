@@ -1,10 +1,10 @@
 package br.ufscar.dsw.imobiliaria;
 
 import br.ufscar.dsw.imobiliaria.domain.*;
-import br.ufscar.dsw.imobiliaria.repository.ClienteRepository;
-import br.ufscar.dsw.imobiliaria.repository.ImobiliariaRepository;
-import br.ufscar.dsw.imobiliaria.repository.ImovelRepository;
-import br.ufscar.dsw.imobiliaria.repository.PropostaCompraRepository;
+import br.ufscar.dsw.imobiliaria.repository.IClienteRepository;
+import br.ufscar.dsw.imobiliaria.repository.IImobiliariaRepository;
+import br.ufscar.dsw.imobiliaria.repository.IImovelRepository;
+import br.ufscar.dsw.imobiliaria.repository.IPropostaCompraRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,10 +23,10 @@ public class ImobiliariaApplication {
 
 	@Bean
 	CommandLineRunner executarCrudExemplo(
-			ClienteRepository clienteRepository,
-			ImobiliariaRepository imobiliariaRepository,
-			ImovelRepository imovelRepository,
-			PropostaCompraRepository propostaCompraRepository) {
+			IClienteRepository clienteRepository,
+			IImobiliariaRepository imobiliariaRepository,
+			IImovelRepository imovelRepository,
+			IPropostaCompraRepository propostaCompraRepository) {
 		return args -> {
 			System.out.println("===== INICIANDO EXEMPLOS DE CRUD =====");
 
