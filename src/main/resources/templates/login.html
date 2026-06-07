@@ -1,0 +1,89 @@
+<!doctype html>
+<html
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:th="http://www.thymeleaf.org"
+  layout:decorate="~{layout}"
+>
+  <head>
+    <title th:text="#{login.title}">Login</title>
+  </head>
+
+  <body>
+    <section layout:fragment="content">
+      <div class="flex items-center justify-center px-4 py-12">
+        <div
+          class="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"
+        >
+          <div class="mb-6 text-center">
+            <h3
+              class="text-2xl font-semibold text-slate-900"
+              th:text="#{login.header}"
+            >
+              Login
+            </h3>
+
+            <p class="mt-2 text-sm text-slate-500" th:text="#{login.message}">
+              Faça login para acessar o sistema
+            </p>
+          </div>
+
+          <form th:action="@{/login}" method="post" class="space-y-5">
+            <div th:if="${param.error}">
+              <div
+                class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                th:text="#{login.error}"
+              >
+                Usuário ou senha inválidos.
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="username"
+                class="mb-1 block text-sm font-medium text-slate-700"
+                th:text="#{login.username}"
+              >
+                Usuário
+              </label>
+
+              <input
+                type="text"
+                id="username"
+                name="username"
+                autofocus="autofocus"
+                th:placeholder="#{login.username}"
+                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              />
+            </div>
+
+            <div>
+              <label
+                for="password"
+                class="mb-1 block text-sm font-medium text-slate-700"
+                th:text="#{login.password}"
+              >
+                Senha
+              </label>
+
+              <input
+                type="password"
+                id="password"
+                name="password"
+                th:placeholder="#{login.password}"
+                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              />
+            </div>
+
+            <button
+              type="submit"
+              class="w-full cursor-pointer rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+              th:text="#{login.button}"
+            >
+              Entrar
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

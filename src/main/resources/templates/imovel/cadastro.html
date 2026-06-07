@@ -1,0 +1,232 @@
+<!doctype html>
+
+<html
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:th="http://www.thymeleaf.org"
+  layout:decorate="~{layout}"
+>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+
+  <body>
+    <section layout:fragment="content">
+      <div class="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <div
+          class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 text-white"
+            >
+              <ion-icon name="business-outline" class="text-xl"></ion-icon>
+            </div>
+
+            <div>
+              <h1
+                class="text-2xl font-bold text-slate-900"
+                th:text="#{imovel.cadastrar.label}"
+              >
+                Cadastrar Imóvel
+              </h1>
+
+              <p
+                class="mt-1 text-sm text-slate-500"
+                th:text="#{imovel.form.descricao}"
+              >
+                Preencha os dados abaixo para cadastrar ou editar um imóvel.
+              </p>
+            </div>
+          </div>
+
+          <a
+            th:href="@{/imoveis/listar}"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100"
+            role="button"
+          >
+            <ion-icon name="list-outline" class="text-lg"></ion-icon>
+            <span th:text="#{sidebar.link.listar}">Listar</span>
+          </a>
+        </div>
+
+        <div th:replace="~{fragments/alert}"></div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <form
+            th:action="${imovel.id == null} ? @{/imoveis/salvar} : @{/imoveis/editar}"
+            th:object="${imovel}"
+            method="POST"
+            class="space-y-6"
+          >
+            <div class="grid gap-6 md:grid-cols-3">
+              <div class="md:col-span-2">
+                <label
+                  for="endereco"
+                  class="mb-1 block text-sm font-medium text-slate-700"
+                  th:text="#{imovel.endereco.label}"
+                >
+                  Endereço
+                </label>
+
+                <input
+                  type="text"
+                  id="endereco"
+                  autofocus="autofocus"
+                  th:field="*{endereco}"
+                  th:placeholder="#{imovel.endereco.placeholder}"
+                  th:classappend="${#fields.hasErrors('endereco')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
+                  class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                />
+
+                <p
+                  class="mt-1 text-sm text-red-600"
+                  th:if="${#fields.hasErrors('endereco')}"
+                  th:errors="*{endereco}"
+                ></p>
+              </div>
+
+              <div>
+                <label
+                  for="cidade"
+                  class="mb-1 block text-sm font-medium text-slate-700"
+                  th:text="#{imovel.cidade.label}"
+                >
+                  Cidade
+                </label>
+
+                <select
+                  id="cidade"
+                  th:field="*{cidade}"
+                  th:classappend="${#fields.hasErrors('cidade')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
+                  class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                >
+                  <option value="" th:text="#{imovel.cidade.select}">
+                    Selecione uma cidade
+                  </option>
+
+                  <option
+                    th:each="cidade : ${cidades}"
+                    th:value="${cidade.id}"
+                    th:text="${cidade.nome}"
+                  ></option>
+                </select>
+
+                <p
+                  class="mt-1 text-sm text-red-600"
+                  th:if="${#fields.hasErrors('cidade')}"
+                  th:errors="*{cidade}"
+                ></p>
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="descricao"
+                class="mb-1 block text-sm font-medium text-slate-700"
+                th:text="#{imovel.descricao.label}"
+              >
+                Descrição
+              </label>
+
+              <textarea
+                id="descricao"
+                rows="4"
+                th:field="*{descricao}"
+                th:placeholder="#{imovel.descricao.placeholder}"
+                th:classappend="${#fields.hasErrors('descricao')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
+                class="block w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              ></textarea>
+
+              <p
+                class="mt-1 text-sm text-red-600"
+                th:if="${#fields.hasErrors('descricao')}"
+                th:errors="*{descricao}"
+              ></p>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2">
+              <div>
+                <label
+                  for="valor"
+                  class="mb-1 block text-sm font-medium text-slate-700"
+                  th:text="#{imovel.valor.label}"
+                >
+                  Valor
+                </label>
+
+                <div class="relative">
+                  <span
+                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-slate-500"
+                  >
+                    R$
+                  </span>
+                  <input
+                    type="number"
+                    id="valor"
+                    step="0.01"
+                    min="0"
+                    th:field="*{valor}"
+                    th:placeholder="#{imovel.valor.placeholder}"
+                    th:classappend="${#fields.hasErrors('valor')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
+                    class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pl-10 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                  />
+                </div>
+
+                <p
+                  class="mt-1 text-sm text-red-600"
+                  th:if="${#fields.hasErrors('valor')}"
+                  th:errors="*{valor}"
+                ></p>
+              </div>
+
+              <div>
+                <label
+                  for="imobiliaria"
+                  class="mb-1 block text-sm font-medium text-slate-700"
+                  th:text="#{imobiliaria.cadastrar.label}"
+                >
+                  Imobiliária
+                </label>
+
+                <select
+                  id="imobiliaria"
+                  th:field="*{imobiliaria}"
+                  th:classappend="${#fields.hasErrors('imobiliaria')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
+                  class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                >
+                  <option value="" th:text="#{imovel.imobiliaria.select}">
+                    Selecione uma imobiliária
+                  </option>
+
+                  <option
+                    th:each="imob : ${imobiliarias}"
+                    th:value="${imob.id}"
+                    th:text="${imob.nome}"
+                  ></option>
+                </select>
+
+                <p
+                  class="mt-1 text-sm text-red-600"
+                  th:if="${#fields.hasErrors('imobiliaria')}"
+                  th:errors="*{imobiliaria}"
+                ></p>
+              </div>
+            </div>
+
+            <input type="hidden" id="id" th:field="*{id}" />
+
+            <div class="flex justify-end border-t border-slate-200 pt-6">
+              <button
+                type="submit"
+                class="cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+              >
+                <ion-icon name="save-outline" class="text-lg"></ion-icon>
+                <span th:text="#{button.salvar.label}">Salvar</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

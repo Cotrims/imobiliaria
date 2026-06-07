@@ -1,0 +1,69 @@
+<!doctype html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+  <head>
+    <title th:text="#{title.label}">Imobiliária</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="Sistema para compra/venda de imóveis" />
+    <meta name="author" content="Vinícius Martins Cotrim" />
+
+    <link rel="icon" th:href="@{/image/favicon.png}" />
+
+    <!-- Custom styles for this template -->
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css"
+    />
+  </head>
+  <body>
+    <header th:replace="~{fragments/header::header}"></header>
+
+    <section layout:fragment="content" class="min-h-screen"></section>
+
+    <footer th:replace="~{fragments/footer::footer}"></footer>
+
+    <!-- JQuery -->
+    <script th:src="@{/webjars/jquery/3.4.1/jquery.min.js}"></script>
+    <script
+      th:src="@{/webjars/jquery-mask-plugin/1.14.15/dist/jquery.mask.min.js}"
+    ></script>
+    <script type="text/javascript">
+      var url = "";
+
+      // keep existing button behaviour for delete buttons
+      $('button[id*="btn_"]').click(function () {
+        var host = window.location.host + "/";
+        url = "http://" + host + $(this).attr("id").split("_")[1];
+      });
+
+      $("#ok_confirm").click(function () {
+        document.location.href = url;
+      });
+    </script>
+
+    <script th:src="@{/js/delete-modal.js}"></script>
+    <script th:src="@{/js/header.js}"></script>
+    <script th:src="@{/js/masks.js}"></script>
+
+    <!-- Ionicons -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+  </body>
+</html>

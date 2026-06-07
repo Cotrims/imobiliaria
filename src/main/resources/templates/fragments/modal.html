@@ -1,0 +1,53 @@
+<div
+  id="delete-modal"
+  th:fragment="modal"
+  xmlns:th="http://www.thymeleaf.org"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/50 px-4"
+>
+  <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+    <div class="flex items-start gap-4">
+      <div
+        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600"
+      >
+        <ion-icon name="warning-outline" class="text-2xl"></ion-icon>
+      </div>
+
+      <div>
+        <h2
+          class="text-lg font-semibold text-slate-900"
+          th:text="#{modal.delete.title}"
+        >
+          Confirmar exclusão
+        </h2>
+
+        <p
+          class="mt-2 text-sm leading-6 text-slate-500"
+          th:text="#{modal.delete.message}"
+        >
+          Tem certeza que deseja excluir este registro? Essa ação não poderá ser
+          desfeita.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <button
+        id="delete-modal-cancel"
+        type="button"
+        class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100"
+        th:text="#{button.cancelar.label}"
+      >
+        Cancelar
+      </button>
+
+      <button
+        id="delete-modal-confirm"
+        type="button"
+        class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
+        th:text="#{link.excluir.label}"
+      >
+        Excluir
+      </button>
+    </div>
+  </div>
+</div>

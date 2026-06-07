@@ -1,0 +1,103 @@
+<!doctype html>
+<html
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:th="http://www.thymeleaf.org"
+  layout:decorate="~{layout}"
+>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <section layout:fragment="content">
+      <div class="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold" th:text="${proposta.imovel.endereco}">
+            Avaliar Proposta
+          </h1>
+          <p
+            class="text-sm text-slate-500"
+            th:text="${proposta.cliente.nome}"
+          ></p>
+        </div>
+
+        <div th:replace="~{fragments/alert}"></div>
+
+        <form th:action="@{/propostas/decidir}" method="post" class="space-y-4">
+          <input type="hidden" name="id" th:value="${proposta.id}" />
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700"
+              >Valor da proposta</label
+            >
+            <div
+              class="mt-1 text-lg font-semibold"
+              th:text="${#numbers.formatCurrency(proposta.valorProposta)}"
+            ></div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700"
+              >Condições de pagamento</label
+            >
+            <div
+              class="mt-1 text-sm text-slate-600"
+              th:text="${proposta.condicoesPagamento}"
+            ></div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700"
+              >Decisão</label
+            >
+            <select name="acao" class="mt-1 block w-full rounded-md border">
+              <option value="NAO_ACEITO">Não aceito</option>
+              <option value="ACEITO">Aceito</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700"
+              >Contraproposta (valor)</label
+            >
+            <input
+              type="text"
+              name="contraValor"
+              class="mt-1 block w-full rounded-md border"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700"
+              >Contraproposta (condições)</label
+            >
+            <textarea
+              name="contraCondicoes"
+              rows="3"
+              class="mt-1 block w-full rounded-md border"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700"
+              >Link da videoconferência (se aceitar)</label
+            >
+            <input
+              type="text"
+              name="meetingLink"
+              class="mt-1 block w-full rounded-md border"
+            />
+          </div>
+
+          <div class="flex justify-end">
+            <button
+              type="submit"
+              class="rounded bg-slate-900 px-4 py-2 text-white"
+            >
+              Enviar decisão
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </body>
+</html>
