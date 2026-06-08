@@ -1,0 +1,41 @@
+<th:block th:fragment="mobile" xmlns:th="http://www.thymeleaf.org">
+  <a
+    class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    th:href="@{/imoveis/cadastrar}"
+  >
+    <ion-icon name="business-outline" class="text-lg"></ion-icon>
+    <span th:text="#{sidebar.titulo.imovel}">Imóveis</span>
+    <span>-</span>
+    <span th:text="#{sidebar.link.cadastrar}">Cadastrar</span>
+  </a>
+
+  <a
+    class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    th:href="@{/imoveis/meus}"
+  >
+    <ion-icon name="business-outline" class="text-lg"></ion-icon>
+    <span th:text="#{sidebar.titulo.imovel}">Imóveis</span>
+    <span>-</span>
+    <span th:text="#{imovel.meus.label}">Meus imóveis</span>
+  </a>
+
+  <a
+    class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    th:href="@{/propostas/cadastrar}"
+  >
+    <ion-icon name="document-text-outline" class="text-lg"></ion-icon>
+    <span th:text="#{sidebar.titulo.proposta}">Propostas</span>
+    <span>-</span>
+    <span th:text="#{sidebar.link.cadastrar}">Cadastrar</span>
+  </a>
+
+  <a
+    class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    th:href="@{/propostas/listar}"
+  >
+    <ion-icon name="document-text-outline" class="text-lg"></ion-icon>
+    <span th:text="#{sidebar.titulo.proposta}">Propostas</span>
+    <span>-</span>
+    <span th:text="#{sidebar.link.listar}">Listar</span>
+  </a>
+</th:block>

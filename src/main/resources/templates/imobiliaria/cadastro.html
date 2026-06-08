@@ -1,0 +1,210 @@
+<!doctype html>
+
+<html
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:th="http://www.thymeleaf.org"
+  layout:decorate="~{layout}"
+>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+
+  <body>
+    <section layout:fragment="content">
+      <div class="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <div
+          class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 text-white"
+            >
+              <ion-icon name="storefront-outline" class="text-xl"></ion-icon>
+            </div>
+
+            <div>
+              <h1
+                class="text-2xl font-bold text-slate-900"
+                th:text="#{imobiliaria.cadastrar.label}"
+              >
+                Cadastrar Imobiliária
+              </h1>
+
+              <p
+                class="mt-1 text-sm text-slate-500"
+                th:text="#{imobiliaria.form.description}"
+              >
+                Preencha os dados abaixo para cadastrar ou editar uma
+                imobiliária.
+              </p>
+            </div>
+          </div>
+
+          <a
+            th:href="@{/imobiliarias/listar}"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100"
+            role="button"
+          >
+            <ion-icon name="list-outline" class="text-lg"></ion-icon>
+            <span th:text="#{imobiliaria.listar.label}"
+              >Listar Imobiliárias</span
+            >
+          </a>
+        </div>
+
+        <div th:replace="~{fragments/alert}"></div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <form
+            th:action="${imobiliaria.id == null} ? @{/imobiliarias/salvar} : @{/imobiliarias/editar}"
+            th:object="${imobiliaria}"
+            method="POST"
+            class="space-y-6"
+          >
+            <div class="grid gap-6 md:grid-cols-2">
+              <div>
+                <label
+                  for="email"
+                  class="mb-1 block text-sm font-medium text-slate-700"
+                  th:text="#{imobiliaria.email.label}"
+                >
+                  E-mail
+                </label>
+
+                <input
+                  type="email"
+                  id="email"
+                  autofocus="autofocus"
+                  th:field="*{usuario.username}"
+                  th:placeholder="#{imobiliaria.email.placeholder}"
+                  th:classappend="${#fields.hasErrors('usuario.username')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
+                  class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                />
+
+                <p
+                  class="mt-1 text-sm text-red-600"
+                  th:if="${#fields.hasErrors('usuario.username')}"
+                  th:errors="*{usuario.username}"
+                ></p>
+              </div>
+
+              <div>
+                <label
+                  for="senha"
+                  class="mb-1 block text-sm font-medium text-slate-700"
+                  th:text="#{login.password}"
+                >
+                  Senha
+                </label>
+
+                <input
+                  type="password"
+                  id="senha"
+                  th:field="*{usuario.password}"
+                  th:placeholder="#{login.password}"
+                  th:classappend="${#fields.hasErrors('usuario.password')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
+                  class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                />
+
+                <p
+                  class="mt-1 text-sm text-red-600"
+                  th:if="${#fields.hasErrors('usuario.password')}"
+                  th:errors="*{usuario.password}"
+                ></p>
+              </div>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2">
+              <div>
+                <label
+                  for="CNPJ"
+                  class="mb-1 block text-sm font-medium text-slate-700"
+                >
+                  CNPJ
+                </label>
+
+                <input
+                  type="text"
+                  id="CNPJ"
+                  th:field="*{CNPJ}"
+                  th:placeholder="#{imobiliaria.cnpj.placeholder}"
+                  th:classappend="${#fields.hasErrors('CNPJ')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
+                  data-mask="00.000.000/0000-00"
+                  class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                />
+
+                <p
+                  class="mt-1 text-sm text-red-600"
+                  th:if="${#fields.hasErrors('CNPJ')}"
+                  th:errors="*{CNPJ}"
+                ></p>
+              </div>
+
+              <div>
+                <label
+                  for="nome"
+                  class="mb-1 block text-sm font-medium text-slate-700"
+                  th:text="#{imobiliaria.nome.label}"
+                >
+                  Nome
+                </label>
+
+                <input
+                  type="text"
+                  id="nome"
+                  th:field="*{nome}"
+                  th:placeholder="#{imobiliaria.nome.placeholder}"
+                  th:classappend="${#fields.hasErrors('nome')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
+                  class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                />
+
+                <p
+                  class="mt-1 text-sm text-red-600"
+                  th:if="${#fields.hasErrors('nome')}"
+                  th:errors="*{nome}"
+                ></p>
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="descricao"
+                class="mb-1 block text-sm font-medium text-slate-700"
+                th:text="#{imobiliaria.descricao.label}"
+              >
+                Descrição
+              </label>
+
+              <textarea
+                id="descricao"
+                rows="4"
+                th:field="*{descricao}"
+                th:placeholder="#{imobiliaria.descricao.placeholder}"
+                th:classappend="${#fields.hasErrors('descricao')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
+                class="block w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              ></textarea>
+
+              <p
+                class="mt-1 text-sm text-red-600"
+                th:if="${#fields.hasErrors('descricao')}"
+                th:errors="*{descricao}"
+              ></p>
+            </div>
+
+            <input type="hidden" id="id" th:field="*{id}" />
+
+            <div class="flex justify-end border-t border-slate-200 pt-6">
+              <button
+                type="submit"
+                class="cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+              >
+                <ion-icon name="save-outline" class="text-lg"></ion-icon>
+                <span th:text="#{button.salvar.label}">Salvar</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

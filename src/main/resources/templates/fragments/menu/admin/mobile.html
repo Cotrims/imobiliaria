@@ -1,0 +1,81 @@
+<th:block th:fragment="mobile" xmlns:th="http://www.thymeleaf.org">
+  <a
+    class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    th:href="@{/imoveis/cadastrar}"
+  >
+    <ion-icon name="business-outline" class="text-lg"></ion-icon>
+    <span th:text="#{sidebar.titulo.imovel}">Imóveis</span>
+    <span>-</span>
+    <span th:text="#{sidebar.link.cadastrar}">Cadastrar</span>
+  </a>
+
+  <a
+    class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    th:href="@{/imoveis/listar}"
+  >
+    <ion-icon name="business-outline" class="text-lg"></ion-icon>
+    <span th:text="#{sidebar.titulo.imovel}">Imóveis</span>
+    <span>-</span>
+    <span th:text="#{sidebar.link.listar}">Listar</span>
+  </a>
+
+  <a
+    class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    th:href="@{/imobiliarias/cadastrar}"
+  >
+    <ion-icon name="storefront-outline" class="text-lg"></ion-icon>
+    <span th:text="#{sidebar.titulo.imobiliaria}">Imobiliárias</span>
+    <span>-</span>
+    <span th:text="#{sidebar.link.cadastrar}">Cadastrar</span>
+  </a>
+
+  <a
+    class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    th:href="@{/imobiliarias/listar}"
+  >
+    <ion-icon name="storefront-outline" class="text-lg"></ion-icon>
+    <span th:text="#{sidebar.titulo.imobiliaria}">Imobiliárias</span>
+    <span>-</span>
+    <span th:text="#{sidebar.link.listar}">Listar</span>
+  </a>
+
+  <a
+    class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    th:href="@{/clientes/cadastrar}"
+  >
+    <ion-icon name="people-outline" class="text-lg"></ion-icon>
+    <span th:text="#{sidebar.titulo.cliente}">Clientes</span>
+    <span>-</span>
+    <span th:text="#{sidebar.link.cadastrar}">Cadastrar</span>
+  </a>
+
+  <a
+    class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    th:href="@{/clientes/listar}"
+  >
+    <ion-icon name="people-outline" class="text-lg"></ion-icon>
+    <span th:text="#{sidebar.titulo.cliente}">Clientes</span>
+    <span>-</span>
+    <span th:text="#{sidebar.link.listar}">Listar</span>
+  </a>
+
+  <a
+    class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    th:href="@{/propostas/cadastrar}"
+  >
+    <ion-icon name="document-text-outline" class="text-lg"></ion-icon>
+    <span th:text="#{sidebar.titulo.proposta}">Propostas</span>
+    <span>-</span>
+    <span th:text="#{sidebar.link.cadastrar}">Cadastrar</span>
+  </a>
+
+  <a
+    class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    th:href="@{/propostas/listar}"
+  >
+    <ion-icon name="document-text-outline" class="text-lg"></ion-icon>
+    <span th:text="#{sidebar.titulo.proposta}">Propostas</span>
+    <span>-</span>
+    <span th:text="#{sidebar.link.listar}">Listar</span>
+  </a>
+</th:block>

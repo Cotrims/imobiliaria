@@ -1,0 +1,148 @@
+<header
+  th:fragment="header"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity"
+  class="sticky top-0 z-40 border-b border-slate-200 bg-white"
+>
+  <nav
+    class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
+  >
+    <a
+      th:href="@{/}"
+      class="flex items-center gap-2 text-lg font-bold text-slate-900"
+    >
+      <span th:text="#{title.label}">Imobiliária</span>
+    </a>
+
+    <button
+      id="mobile-menu-button"
+      type="button"
+      class="inline-flex items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 md:hidden"
+      aria-label="Abrir menu"
+    >
+      <ion-icon name="menu-outline" class="text-3xl"></ion-icon>
+    </button>
+
+    <div class="hidden items-center gap-2 md:flex">
+      <a
+        class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+        th:href="@{/}"
+      >
+        <ion-icon name="home-outline" class="text-lg"></ion-icon>
+        <span th:text="#{sidebar.link.home}">Início</span>
+      </a>
+
+      <div
+        sec:authorize="hasRole('ADMIN')"
+        th:replace="~{fragments/menu/admin/desktop::desktop}"
+      ></div>
+
+      <div
+        sec:authorize="hasRole('CLIENTE')"
+        th:replace="~{fragments/menu/cliente/desktop::desktop}"
+      ></div>
+
+      <div
+        sec:authorize="hasRole('IMOBILIARIA')"
+        th:replace="~{fragments/menu/imobiliaria/desktop::desktop}"
+      ></div>
+    </div>
+
+    <div class="hidden items-center gap-3 md:flex">
+      <a th:href="@{/(lang='pt')}" class="rounded hover:opacity-80">
+        <span class="fi fi-br"></span>
+      </a>
+
+      <a th:href="@{/(lang='en')}" class="rounded hover:opacity-80">
+        <span class="fi fi-us" title="EN"></span>
+      </a>
+
+      <a
+        sec:authorize="!isAuthenticated()"
+        class="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+        th:href="@{/login}"
+      >
+        <ion-icon name="log-in-outline" class="text-lg"></ion-icon>
+        Entrar
+      </a>
+
+      <form
+        sec:authorize="isAuthenticated()"
+        th:action="@{/logout}"
+        method="post"
+      >
+        <button
+          class="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+          type="submit"
+        >
+          <ion-icon name="log-out-outline" class="text-lg"></ion-icon>
+          <span th:text="#{header.sair}">Sair</span>
+        </button>
+      </form>
+    </div>
+  </nav>
+
+  <div
+    id="mobile-menu"
+    class="hidden border-t border-slate-200 bg-white px-4 py-3 md:hidden"
+  >
+    <div class="flex flex-col gap-1">
+      <a
+        class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+        th:href="@{/}"
+      >
+        <ion-icon name="home-outline" class="text-lg"></ion-icon>
+        <span th:text="#{sidebar.link.home}">Início</span>
+      </a>
+
+      <div
+        sec:authorize="hasRole('ADMIN')"
+        th:replace="~{fragments/menu/admin/mobile::mobile}"
+      ></div>
+
+      <div
+        sec:authorize="hasRole('CLIENTE')"
+        th:replace="~{fragments/menu/cliente/mobile::mobile}"
+      ></div>
+
+      <div
+        sec:authorize="hasRole('IMOBILIARIA')"
+        th:replace="~{fragments/menu/imobiliaria/mobile::mobile}"
+      ></div>
+
+      <div class="mt-3 flex items-center gap-3 px-3">
+        <a th:href="@{/(lang='pt')}" class="rounded hover:opacity-80">
+          <span class="fi fi-br"></span>
+        </a>
+
+        <a th:href="@{/(lang='en')}" class="rounded hover:opacity-80">
+          <span class="fi fi-us" title="EN"></span>
+        </a>
+      </div>
+
+      <a
+        sec:authorize="!isAuthenticated()"
+        class="mt-2 flex items-center justify-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+        th:href="@{/login}"
+      >
+        <ion-icon name="log-in-outline" class="text-lg"></ion-icon>
+        Entrar
+      </a>
+
+      <form
+        sec:authorize="isAuthenticated()"
+        th:action="@{/logout}"
+        method="post"
+        class="mt-2"
+      >
+        <button
+          class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+          type="submit"
+        >
+          <ion-icon name="log-out-outline" class="text-lg"></ion-icon>
+          <span th:text="#{header.sair}"> Sair</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</header>

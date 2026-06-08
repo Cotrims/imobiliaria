@@ -1,0 +1,124 @@
+<!doctype html>
+<html
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:th="http://www.thymeleaf.org"
+  layout:decorate="~{layout}"
+>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <section layout:fragment="content">
+      <div class="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+
+        <div class="mb-6 flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 text-white">
+            <ion-icon name="clipboard-outline" class="text-xl"></ion-icon>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-slate-900">Avaliar Proposta</h1>
+            <p class="text-sm text-slate-500" th:text="${proposta.imovel.endereco + ' — ' + proposta.imovel.cidade.nome}"></p>
+          </div>
+        </div>
+
+        <div th:replace="~{fragments/alert}"></div>
+
+        <!-- Detalhes da proposta -->
+        <div class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+          <div class="grid gap-4 md:grid-cols-2">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Cliente</p>
+              <p class="mt-1 text-sm font-medium text-slate-800" th:text="${proposta.cliente.nome}"></p>
+              <p class="text-xs text-slate-500" th:text="${proposta.cliente.usuario.username}"></p>
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Data da proposta</p>
+              <p class="mt-1 text-sm font-medium text-slate-800" th:text="${#temporals.format(proposta.dataProposta, 'dd/MM/yyyy HH:mm')}"></p>
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Valor da proposta</p>
+              <p class="mt-1 text-lg font-bold text-slate-900" th:text="${#numbers.formatCurrency(proposta.valorProposta)}"></p>
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Valor do imóvel</p>
+              <p class="mt-1 text-sm font-medium text-slate-800" th:text="${#numbers.formatCurrency(proposta.imovel.valor)}"></p>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Condições de pagamento</p>
+            <p class="mt-1 text-sm text-slate-600" th:text="${proposta.condicoesPagamento}"></p>
+          </div>
+        </div>
+
+        <!-- Formulário de decisão -->
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <form th:action="@{/propostas/decidir}" method="post" class="space-y-5">
+            <input type="hidden" name="id" th:value="${proposta.id}" />
+
+            <div>
+              <label for="acao" class="mb-1 block text-sm font-medium text-slate-700">Decisão *</label>
+              <select id="acao" name="acao" required
+                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200">
+                <option value="">Selecione...</option>
+                <option value="NAO_ACEITO">Não aceitar</option>
+                <option value="ACEITO">Aceitar</option>
+              </select>
+            </div>
+
+            <!-- Campos para NAO_ACEITO -->
+            <fieldset id="secaoNaoAceito" class="space-y-4 rounded-lg border border-slate-200 p-4" style="display:none">
+              <legend class="px-2 text-sm font-semibold text-slate-700">Contraproposta (opcional)</legend>
+              <div>
+                <label for="contraValor" class="mb-1 block text-sm font-medium text-slate-700">Valor sugerido</label>
+                <input type="text" id="contraValor" name="contraValor" placeholder="Ex: 420000"
+                  class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200" />
+              </div>
+              <div>
+                <label for="contraCondicoes" class="mb-1 block text-sm font-medium text-slate-700">Condições sugeridas</label>
+                <textarea id="contraCondicoes" name="contraCondicoes" rows="3"
+                  class="block w-full resize-y rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"></textarea>
+              </div>
+            </fieldset>
+
+            <!-- Campos para ACEITO -->
+            <fieldset id="secaoAceito" class="space-y-4 rounded-lg border border-green-200 p-4" style="display:none">
+              <legend class="px-2 text-sm font-semibold text-green-700">Reunião por videoconferência</legend>
+              <div>
+                <label for="meetingLink" class="mb-1 block text-sm font-medium text-slate-700">Link da videoconferência *</label>
+                <input type="url" id="meetingLink" name="meetingLink"
+                  placeholder="https://meet.google.com/xxx ou https://zoom.us/j/xxx"
+                  class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200" />
+                <p class="mt-1 text-xs text-slate-500">Google Meet, Zoom, Teams, etc.</p>
+              </div>
+              <div>
+                <label for="meetingHorario" class="mb-1 block text-sm font-medium text-slate-700">Horário sugerido</label>
+                <input type="datetime-local" id="meetingHorario" name="meetingHorario"
+                  class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200" />
+              </div>
+            </fieldset>
+
+            <div class="flex justify-end gap-3 border-t border-slate-200 pt-4">
+              <a th:href="@{/propostas/imobiliaria}"
+                class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                Cancelar
+              </a>
+              <button type="submit"
+                class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800">
+                <ion-icon name="send-outline" class="text-lg"></ion-icon>
+                Enviar decisão
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <script>
+        const acao = document.getElementById('acao');
+        const secaoNao = document.getElementById('secaoNaoAceito');
+        const secaoSim = document.getElementById('secaoAceito');
+        acao.addEventListener('change', () => {
+          secaoNao.style.display = acao.value === 'NAO_ACEITO' ? '' : 'none';
+          secaoSim.style.display = acao.value === 'ACEITO' ? '' : 'none';
+        });
+      </script>
+    </section>
+  </body>
+</html>

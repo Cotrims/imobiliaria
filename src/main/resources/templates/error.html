@@ -1,0 +1,68 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="Página de erro" />
+    <meta name="author" content="" />
+
+    <link rel="icon" th:href="@{/image/favicon.png}" />
+
+    <title th:text="${status}">Erro</title>
+
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
+
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <main class="flex min-h-screen items-center justify-center px-4 py-10">
+      <div
+        class="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm"
+      >
+        <div
+          class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-red-600"
+        >
+          <ion-icon name="alert-circle-outline" class="text-4xl"></ion-icon>
+        </div>
+
+        <h1 class="text-3xl font-bold text-slate-900">
+          <span th:text="${status}">Erro</span>
+        </h1>
+
+        <h2
+          class="mt-2 text-lg font-semibold text-slate-700"
+          th:text="${error}"
+        >
+          Algo deu errado
+        </h2>
+
+        <p class="mt-4 text-sm leading-6 text-slate-500" th:text="${message}">
+          Não foi possível processar sua solicitação.
+        </p>
+
+        <div class="mt-8">
+          <a
+            class="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+            href="javascript:history.back()"
+          >
+            <ion-icon name="arrow-back-outline" class="text-lg"></ion-icon>
+            Voltar à página anterior
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+  </body>
+</html>

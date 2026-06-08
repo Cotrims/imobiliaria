@@ -1,0 +1,214 @@
+<!doctype html>
+
+<html
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:th="http://www.thymeleaf.org"
+  layout:decorate="~{layout}"
+>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+
+  <body>
+    <section layout:fragment="content">
+      <div class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div
+          class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 text-white"
+            >
+              <ion-icon name="people-outline" class="text-xl"></ion-icon>
+            </div>
+
+            <div>
+              <h1
+                class="text-2xl font-bold text-slate-900"
+                th:text="#{cliente.listar.label}"
+              >
+                Listar Clientes
+              </h1>
+
+              <p
+                class="mt-1 text-sm text-slate-500"
+                th:text="#{cliente.listar.descricao}"
+              >
+                Consulte os clientes cadastrados no sistema.
+              </p>
+            </div>
+          </div>
+
+          <a
+            th:href="@{/clientes/cadastrar}"
+            class="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+            role="button"
+          >
+            <ion-icon name="add-outline" class="text-lg"></ion-icon>
+            <span th:text="#{cliente.novo.label}">Novo Cliente</span>
+          </a>
+        </div>
+
+        <div th:replace="~{fragments/alert}"></div>
+
+        <div
+          class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+        >
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+              <thead class="bg-slate-50">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                  >
+                    #
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                  >
+                    E-mail
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                  >
+                    CPF
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    th:text="#{cliente.nome.label}"
+                  >
+                    Nome
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    th:text="#{cliente.telefone.label}"
+                  >
+                    Telefone
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    th:text="#{cliente.sexo.label}"
+                  >
+                    Sexo
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    th:text="#{cliente.dataNascimento.label}"
+                  >
+                    Data de Nascimento
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    th:text="#{acao.label}"
+                  >
+                    Ação
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody class="divide-y divide-slate-100 bg-white">
+                <tr
+                  th:each="cliente : ${clientes}"
+                  class="transition hover:bg-slate-50"
+                >
+                  <td
+                    class="whitespace-nowrap px-4 py-3 text-sm font-medium text-slate-900"
+                    th:text="${cliente.id}"
+                  ></td>
+
+                  <td
+                    class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
+                    th:text="${cliente.usuario.username}"
+                  ></td>
+
+                  <td
+                    class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
+                    th:text="${cliente.cpf}"
+                  ></td>
+
+                  <td
+                    class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
+                    th:text="${cliente.nome}"
+                  ></td>
+
+                  <td
+                    class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
+                    th:text="${cliente.telefone}"
+                  ></td>
+
+                  <td
+                    class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
+                    th:text="${cliente.sexo}"
+                  ></td>
+
+                  <td
+                    class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
+                    th:text="${#temporals.format(cliente.dataNascimento, 'dd/MM/yyyy')}"
+                  ></td>
+
+                  <td class="whitespace-nowrap px-4 py-3 text-right text-sm">
+                    <div class="flex justify-end gap-2">
+                      <a
+                        th:href="@{/clientes/editar/{id}(id=${cliente.id})}"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100"
+                        role="button"
+                        th:title="#{link.editar.label}"
+                        th:aria-label="#{link.editar.label}"
+                      >
+                        <ion-icon
+                          name="create-outline"
+                          class="text-lg"
+                        ></ion-icon>
+                      </a>
+
+                      <button
+                        type="button"
+                        th:data-delete-url="@{/clientes/excluir/{id}(id=${cliente.id})}"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 transition hover:bg-red-100"
+                        th:title="#{link.excluir.label}"
+                        th:aria-label="#{link.excluir.label}"
+                      >
+                        <ion-icon
+                          name="trash-outline"
+                          class="text-lg"
+                        ></ion-icon>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(clientes)}">
+                  <td
+                    colspan="8"
+                    class="px-4 py-10 text-center text-sm text-slate-500"
+                  >
+                    <span th:text="#{cliente.lista.vazia}">
+                      Nenhum cliente cadastrado.
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div th:replace="~{fragments/modal :: modal}"></div>
+      </div>
+    </section>
+  </body>
+</html>

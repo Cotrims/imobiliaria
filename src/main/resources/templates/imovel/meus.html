@@ -1,0 +1,238 @@
+<!doctype html>
+<html
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:th="http://www.thymeleaf.org"
+  layout:decorate="~{layout}"
+>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+
+  <body>
+    <section layout:fragment="content">
+      <div class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div
+          class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 text-white"
+            >
+              <ion-icon name="business-outline" class="text-xl"></ion-icon>
+            </div>
+
+            <div>
+              <h1
+                class="text-2xl font-bold text-slate-900"
+                th:text="#{imovel.meus.label}"
+              >
+                Meus imóveis
+              </h1>
+
+              <p
+                class="mt-1 text-sm text-slate-500"
+                th:text="#{imovel.meus.descricao}"
+              >
+                Consulte os imóveis cadastrados no sistema.
+              </p>
+            </div>
+          </div>
+
+          <a
+            th:href="@{/imoveis/cadastrar}"
+            class="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+            role="button"
+          >
+            <ion-icon name="add-outline" class="text-lg"></ion-icon>
+            <span th:text="#{imovel.novo.label}">Novo Imóvel</span>
+          </a>
+        </div>
+
+        <div th:replace="~{fragments/alert}"></div>
+
+        <div
+          class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+        >
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+              <thead class="bg-slate-50">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                  >
+                    #
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                  >
+                    Foto
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    th:text="#{imovel.endereco.label}"
+                  >
+                    Endereço
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    th:text="#{imovel.cidade.label}"
+                  >
+                    Cidade
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    th:text="#{imovel.descricao.label}"
+                  >
+                    Descrição
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    th:text="#{imovel.valor.label}"
+                  >
+                    Valor
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    th:text="#{sidebar.titulo.imobiliaria}"
+                  >
+                    Imobiliária
+                  </th>
+
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    th:text="#{acao.label}"
+                  >
+                    Ação
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody class="divide-y divide-slate-100 bg-white">
+                <tr
+                  th:each="imovel : ${imoveis}"
+                  class="transition hover:bg-slate-50"
+                >
+                  <td
+                    class="whitespace-nowrap px-4 py-3 text-sm font-medium text-slate-900"
+                    th:text="${imovel.id}"
+                  ></td>
+
+                  <td class="whitespace-nowrap px-4 py-3">
+                    <img
+                      th:if="${not #lists.isEmpty(imovel.fotos)}"
+                      th:src="@{/uploads/{n}(n=${imovel.fotos[0].nomeArquivo})}"
+                      alt="Foto"
+                      class="h-14 w-20 rounded object-cover border border-slate-200"
+                    />
+                    <span
+                      th:if="${#lists.isEmpty(imovel.fotos)}"
+                      class="text-xs text-slate-400"
+                      >—</span
+                    >
+                  </td>
+
+                  <td
+                    class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
+                    th:text="${imovel.endereco}"
+                  ></td>
+
+                  <td
+                    class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
+                    th:text="${imovel.cidade.nome}"
+                  ></td>
+
+                  <td class="max-w-xs px-4 py-3 text-sm text-slate-600">
+                    <span
+                      class="line-clamp-2"
+                      th:text="${imovel.descricao}"
+                    ></span>
+                  </td>
+
+                  <td
+                    class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
+                    th:text="${#numbers.formatCurrency(imovel.valor)}"
+                  ></td>
+
+                  <td
+                    class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
+                    th:text="${imovel.imobiliaria.nome}"
+                  ></td>
+
+                  <td class="whitespace-nowrap px-4 py-3 text-right text-sm">
+                    <div class="flex justify-end gap-2">
+                      <a
+                        th:href="@{/imoveis/editar/{id}(id=${imovel.id})}"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100"
+                        role="button"
+                        th:title="#{link.editar.label}"
+                        th:aria-label="#{link.editar.label}"
+                      >
+                        <ion-icon
+                          name="create-outline"
+                          class="text-lg"
+                        ></ion-icon>
+                      </a>
+
+                      <button
+                        type="button"
+                        th:data-delete-url="@{/imoveis/excluir/{id}(id=${imovel.id})}"
+                        class="cursor-pointer inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 transition hover:bg-red-100"
+                        th:title="#{link.excluir.label}"
+                        th:aria-label="#{link.excluir.label}"
+                      >
+                        <ion-icon
+                          name="trash-outline"
+                          class="text-lg"
+                        ></ion-icon>
+                      </button>
+
+                      <a
+                        sec:authorize="hasAuthority('ROLE_CLIENTE')"
+                        th:href="@{/propostas/cadastrar(imovelId=${imovel.id})}"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100"
+                        role="button"
+                        th:title="#{proposta.nova.label}"
+                        th:aria-label="#{proposta.nova.label}"
+                      >
+                        <ion-icon
+                          name="document-text-outline"
+                          class="text-lg"
+                        ></ion-icon>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(imoveis)}">
+                  <td
+                    colspan="8"
+                    class="px-4 py-10 text-center text-sm text-slate-500"
+                  >
+                    <span th:text="#{busca.vazia}">
+                      Nenhum imóvel cadastrado.
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div th:replace="~{fragments/modal :: modal}"></div>
+      </div>
+    </section>
+  </body>
+</html>
