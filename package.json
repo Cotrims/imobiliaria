@@ -19,8 +19,10 @@
   },
   "homepage": "https://github.com/Cotrims/imobiliaria#readme",
   "dependencies": {
+    "flag-icons": "^7.5.0"
+  },
+  "devDependencies": {
     "@tailwindcss/cli": "^4.3.0",
-    "flag-icons": "^7.5.0",
     "tailwindcss": "^4.3.0"
   }
 }

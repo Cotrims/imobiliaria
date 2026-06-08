@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,56 +54,51 @@ public class ImovelController {
     @Value("${app.upload.dir:${user.home}/imoveis-uploads}")
     private String uploadDir;
 
-    // ─── helpers ─────────────────────────────────────────────────────────────
-
-    /** Returns the Imobiliaria for the currently authenticated user, or empty. */
     private Optional<Imobiliaria> imobiliariaLogada() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null)
+        if (auth == null || auth.getName() == null) {
             return Optional.empty();
+        }
+
         Optional<Usuario> user = usuarioService.findByUsername(auth.getName());
         return user.flatMap(u -> imobiliariaService.findByUsuarioId(u.getId()));
     }
 
-    private boolean isAdmin(Authentication auth) {
-        return auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    private boolean pertenceAImobiliariaLogada(Imovel imovel, Imobiliaria imobiliaria) {
+        return imovel != null
+                && imovel.getImobiliaria() != null
+                && imovel.getImobiliaria().getId() != null
+                && imovel.getImobiliaria().getId().equals(imobiliaria.getId());
+    }
+
+    private void carregarCombos(ModelMap model) {
+        model.addAttribute("cidades", cidadeService.findAll());
+        imobiliariaLogada().ifPresent(imob -> model.addAttribute("imobiliariaLogada", imob));
     }
 
     @GetMapping("/cadastrar")
-    public String cadastrar(Imovel imovel, ModelMap model) {
-        model.addAttribute("cidades", cidadeService.findAll());
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (isAdmin(auth)) {
-            model.addAttribute("imobiliarias", imobiliariaService.findAll());
-        } else {
-            imobiliariaLogada().ifPresent(imob -> {
-                System.out.println(imob.getUsuario().getUsername());
-                model.addAttribute("imobiliariaLogada", imob);
-                imovel.setImobiliaria(imob);
-            });
+    public String cadastrar(Imovel imovel, ModelMap model, RedirectAttributes attr) {
+        Optional<Imobiliaria> imob = imobiliariaLogada();
+        if (imob.isEmpty()) {
+            attr.addFlashAttribute("fail", "Usuário autenticado não está vinculado a uma imobiliária.");
+            return "redirect:/";
         }
 
+        imovel.setImobiliaria(imob.get());
+        carregarCombos(model);
         return "imovel/cadastro";
     }
 
     @GetMapping("/listar")
     public String listar(ModelMap model) {
         model.addAttribute("imoveis", service.findAll());
-
         return "imovel/lista";
     }
 
     @GetMapping("/catalogo")
-    public String catalogo(
-            @RequestParam(value = "cidade", required = false) String cidade,
-            ModelMap model) {
-
+    public String catalogo(@RequestParam(value = "cidade", required = false) String cidade, ModelMap model) {
         model.addAttribute("imoveis", service.findByCidadeNome(cidade));
         model.addAttribute("cidade", cidade);
-
         return "imovel/catalogo";
     }
 
@@ -112,16 +108,12 @@ public class ImovelController {
 
         if (imob.isEmpty()) {
             model.addAttribute("imoveis", List.of());
-
-            return "imovel/lista";
+            return "imovel/meus";
         }
 
         model.addAttribute("imoveis", service.findByImobiliariaId(imob.get().getId()));
-
         return "imovel/meus";
     }
-
-    // ─── salvar ───────────────────────────────────────────────────────────────
 
     @PostMapping("/salvar")
     public String salvar(
@@ -131,64 +123,46 @@ public class ImovelController {
             ModelMap model,
             RedirectAttributes attr) {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("================= INSERIR COM FOTO");
 
-        if (!isAdmin(auth)) {
-            imobiliariaLogada().ifPresent(imovel::setImobiliaria);
+        Optional<Imobiliaria> imob = imobiliariaLogada();
+        if (imob.isEmpty()) {
+            attr.addFlashAttribute("fail", "Usuário autenticado não está vinculado a uma imobiliária.");
+            return "redirect:/";
         }
 
-        if (imovel.getImobiliaria() == null || imovel.getImobiliaria().getId() == null) {
-            result.rejectValue("imobiliaria", "NotNull.imovel.imobiliaria");
+        imovel.setImobiliaria(imob.get());
+
+        int fotoCount = contarFotosEnviadas(fotos);
+        if (fotoCount > 10) {
+            result.reject("fotos.max", "Máximo de 10 fotos permitido.");
+            model.addAttribute("fail", "Máximo de 10 fotos permitido.");
         }
 
         if (result.hasErrors()) {
-            model.addAttribute("cidades", cidadeService.findAll());
-
-            if (isAdmin(auth))
-                model.addAttribute("imobiliarias", imobiliariaService.findAll());
-
-            return "imovel/cadastro";
-        }
-
-        int fotoCount = (fotos == null) ? 0 : (int) fotos.stream().filter(f -> !f.isEmpty()).count();
-
-        if (fotoCount > 10) {
-            model.addAttribute("fail", "Máximo de 10 fotos permitido.");
-            model.addAttribute("cidades", cidadeService.findAll());
-
-            if (isAdmin(auth))
-                model.addAttribute("imobiliarias", imobiliariaService.findAll());
-
+            carregarCombos(model);
             return "imovel/cadastro";
         }
 
         Imovel salvo = service.save(imovel);
-
         salvarFotos(fotos, salvo);
 
         attr.addFlashAttribute("sucess", "Imóvel inserido com sucesso.");
-
-        return isAdmin(auth) ? "redirect:/imoveis/listar" : "redirect:/imoveis/meus";
+        return "redirect:/imoveis/meus";
     }
 
     @GetMapping("/editar/{id}")
-    public String preEditar(@PathVariable("id") Long id, ModelMap model) {
+    public String preEditar(@PathVariable("id") Long id, ModelMap model, RedirectAttributes attr) {
+        Optional<Imobiliaria> imob = imobiliariaLogada();
         Optional<Imovel> opt = service.findById(id);
 
-        if (opt.isEmpty())
-            return "redirect:/imoveis/listar";
-
-        model.addAttribute("imovel", opt.get());
-        model.addAttribute("cidades", cidadeService.findAll());
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (isAdmin(auth)) {
-            model.addAttribute("imobiliarias", imobiliariaService.findAll());
-        } else {
-            imobiliariaLogada().ifPresent(imob -> model.addAttribute("imobiliariaLogada", imob));
+        if (imob.isEmpty() || opt.isEmpty() || !pertenceAImobiliariaLogada(opt.get(), imob.get())) {
+            attr.addFlashAttribute("fail", "Imóvel não encontrado para a imobiliária logada.");
+            return "redirect:/imoveis/meus";
         }
 
+        model.addAttribute("imovel", opt.get());
+        carregarCombos(model);
         return "imovel/cadastro";
     }
 
@@ -201,80 +175,83 @@ public class ImovelController {
             ModelMap model,
             RedirectAttributes attr) {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Optional<Imobiliaria> imob = imobiliariaLogada();
+        Optional<Imovel> existente = imovel.getId() == null ? Optional.empty() : service.findById(imovel.getId());
 
-        if (!isAdmin(auth)) {
-            imobiliariaLogada().ifPresent(imovel::setImobiliaria);
+        if (imob.isEmpty() || existente.isEmpty() || !pertenceAImobiliariaLogada(existente.get(), imob.get())) {
+            attr.addFlashAttribute("fail", "Imóvel não encontrado para a imobiliária logada.");
+            return "redirect:/imoveis/meus";
         }
 
-        if (imovel.getImobiliaria() == null || imovel.getImobiliaria().getId() == null) {
-            result.rejectValue("imobiliaria", "NotNull.imovel.imobiliaria");
+        imovel.setImobiliaria(imob.get());
+
+        int removidas = fotosParaExcluir == null ? 0 : fotosParaExcluir.size();
+        long existentes = Math.max(0, fotoDAO.findByImovelId(imovel.getId()).size() - removidas);
+        int novas = contarFotosEnviadas(fotos);
+
+        if (existentes + novas > 10) {
+            result.reject("fotos.max", "Máximo de 10 fotos permitido.");
+            model.addAttribute("fail", "Máximo de 10 fotos permitido.");
         }
 
         if (result.hasErrors()) {
-            model.addAttribute("cidades", cidadeService.findAll());
-
-            if (isAdmin(auth))
-                model.addAttribute("imobiliarias", imobiliariaService.findAll());
-
+            imovel.setFotos(existente.get().getFotos());
+            carregarCombos(model);
             return "imovel/cadastro";
         }
 
-        // Remove fotos marcadas para exclusão
-        if (fotosParaExcluir != null) {
-            fotosParaExcluir.forEach(fotoId -> fotoDAO.findById(fotoId).ifPresent(foto -> {
-                excluirArquivo(foto.getNomeArquivo());
-                fotoDAO.deleteById(fotoId);
-            }));
-        }
-
-        long existentes = fotoDAO.findByImovelId(imovel.getId()).size()
-                - (fotosParaExcluir != null ? fotosParaExcluir.size() : 0);
-
-        int novas = (fotos == null) ? 0 : (int) fotos.stream().filter(f -> !f.isEmpty()).count();
-
-        if (existentes + novas > 10) {
-            model.addAttribute("fail", "Máximo de 10 fotos permitido.");
-
-            model.addAttribute("cidades", cidadeService.findAll());
-
-            if (isAdmin(auth))
-                model.addAttribute("imobiliarias", imobiliariaService.findAll());
-
-            return "imovel/cadastro";
-        }
+        excluirFotosMarcadas(fotosParaExcluir, imovel.getId());
 
         Imovel salvo = service.save(imovel);
-
         salvarFotos(fotos, salvo);
 
         attr.addFlashAttribute("sucess", "Imóvel editado com sucesso.");
-
-        return isAdmin(auth) ? "redirect:/imoveis/listar" : "redirect:/imoveis/meus";
+        return "redirect:/imoveis/meus";
     }
 
     @GetMapping("/excluir/{id}")
-    public String excluir(@PathVariable("id") Long id, ModelMap model) {
+    public String excluir(@PathVariable("id") Long id, RedirectAttributes attr) {
+        Optional<Imobiliaria> imob = imobiliariaLogada();
         Optional<Imovel> opt = service.findById(id);
 
-        opt.ifPresent(imovel -> {
-            fotoDAO.findByImovelId(id).forEach(foto -> excluirArquivo(foto.getNomeArquivo()));
-        });
+        if (imob.isEmpty() || opt.isEmpty() || !pertenceAImobiliariaLogada(opt.get(), imob.get())) {
+            attr.addFlashAttribute("fail", "Imóvel não encontrado para a imobiliária logada.");
+            return "redirect:/imoveis/meus";
+        }
 
+        fotoDAO.findByImovelId(id).forEach(foto -> excluirArquivo(foto.getNomeArquivo()));
         service.deleteById(id);
 
-        model.addAttribute("sucess", "Imóvel excluído com sucesso.");
+        attr.addFlashAttribute("sucess", "Imóvel excluído com sucesso.");
+        return "redirect:/imoveis/meus";
+    }
 
-        return listar(model);
+    private int contarFotosEnviadas(List<MultipartFile> fotos) {
+        return fotos == null ? 0 : (int) fotos.stream().filter(f -> f != null && !f.isEmpty()).count();
+    }
+
+    private void excluirFotosMarcadas(List<Long> fotosParaExcluir, Long imovelId) {
+        if (fotosParaExcluir == null) {
+            return;
+        }
+
+        fotosParaExcluir.forEach(fotoId -> fotoDAO.findById(fotoId).ifPresent(foto -> {
+            if (foto.getImovel() != null && imovelId.equals(foto.getImovel().getId())) {
+                excluirArquivo(foto.getNomeArquivo());
+                fotoDAO.deleteById(fotoId);
+            }
+        }));
     }
 
     private void salvarFotos(List<MultipartFile> fotos, Imovel imovel) {
-        if (fotos == null)
+        if (fotos == null) {
             return;
+        }
 
         for (MultipartFile foto : fotos) {
-            if (foto == null || foto.isEmpty())
+            if (foto == null || foto.isEmpty()) {
                 continue;
+            }
             try {
                 Path dir = Paths.get(uploadDir).toAbsolutePath().normalize();
                 Files.createDirectories(dir);
@@ -285,7 +262,7 @@ public class ImovelController {
                     ext = original.substring(original.lastIndexOf("."));
                 }
                 String nome = UUID.randomUUID().toString() + ext;
-                Files.copy(foto.getInputStream(), dir.resolve(nome));
+                Files.copy(foto.getInputStream(), dir.resolve(nome), StandardCopyOption.REPLACE_EXISTING);
 
                 FotoImovel fotoImovel = new FotoImovel(imovel, nome);
                 fotoDAO.save(fotoImovel);

@@ -57,6 +57,10 @@
         <span class="fi fi-us" title="EN"></span>
       </a>
 
+      <a th:href="@{/(lang='jp')}" class="rounded hover:opacity-80">
+        <span class="fi fi-jp" title="JP"></span>
+      </a>
+
       <a
         sec:authorize="!isAuthenticated()"
         class="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
@@ -117,6 +121,10 @@
 
         <a th:href="@{/(lang='en')}" class="rounded hover:opacity-80">
           <span class="fi fi-us" title="EN"></span>
+        </a>
+
+        <a th:href="@{/(lang='jp')}" class="rounded hover:opacity-80">
+          <span class="fi fi-jp" title="JP"></span>
         </a>
       </div>
 

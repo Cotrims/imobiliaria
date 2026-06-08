@@ -35,9 +35,14 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String location = java.nio.file.Paths.get(uploadDir).toAbsolutePath().normalize().toUri().toString();
+        if (!location.endsWith("/")) {
+            location = location + "/";
+        }
+
         registry
                 .addResourceHandler("/uploads/**")
-                .addResourceLocations("file:./uploads/");
+                .addResourceLocations(location);
     }
 
     public void addViewControllers(ViewControllerRegistry registry) {

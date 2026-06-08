@@ -8,17 +8,22 @@ public class BigDecimalConversor implements Converter<String, BigDecimal> {
 
     @Override
     public BigDecimal convert(String source) {
-        if (source == null || source.isEmpty()) {
+        if (source == null || source.isBlank()) {
             return null;
         }
 
-        source = source.replace(",", ".");
+        String value = source.trim()
+                .replace("R$", "")
+                .replace(" ", "");
+
+        if (value.contains(",")) {
+            value = value.replace(".", "").replace(",", ".");
+        }
 
         try {
-            return new BigDecimal(Double.parseDouble(source));
+            return new BigDecimal(value);
         } catch (NumberFormatException e) {
             return null;
         }
     }
-
 }

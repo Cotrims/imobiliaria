@@ -14,88 +14,81 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-        @Bean
-        public UsuarioDetailsServiceImpl userDetailsService() {
-                return new UsuarioDetailsServiceImpl();
-        }
+    @Bean
+    public UsuarioDetailsServiceImpl userDetailsService() {
+        return new UsuarioDetailsServiceImpl();
+    }
 
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-                return new BCryptPasswordEncoder();
-        }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-        @Bean
-        public DaoAuthenticationProvider authenticationProvider(
-                        UsuarioDetailsServiceImpl userDetailsService,
-                        PasswordEncoder passwordEncoder) {
-                DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-                authProvider.setPasswordEncoder(passwordEncoder);
-                return authProvider;
-        }
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider(
+            UsuarioDetailsServiceImpl userDetailsService,
+            PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
+    }
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(
-                        HttpSecurity http,
-                        DaoAuthenticationProvider authenticationProvider) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            DaoAuthenticationProvider authenticationProvider) throws Exception {
 
-                http
-                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
-                                .authenticationProvider(authenticationProvider)
+        http
+                .csrf(csrf -> csrf.disable())
+                .authenticationProvider(authenticationProvider)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/", "/index", "/error", "/login", "/login/**", "/acesso-negado",
+                                "/imoveis/catalogo", "/imoveis/catalogo/**")
+                        .permitAll()
+                        .requestMatchers(
+                                "/css/**", "/js/**", "/images/**", "/image/**",
+                                "/webjars/**", "/uploads/**")
+                        .permitAll()
 
-                                .authorizeHttpRequests(auth -> auth
-                                                // páginas públicas
-                                                .requestMatchers("/", "/index", "/error", "/login", "/login/**",
-                                                                "/acesso-negado")
-                                                .permitAll()
+                        // AA1: CRUD de clientes e imobiliárias apenas para administrador.
+                        .requestMatchers("/clientes/**", "/imobiliarias/**", "/usuarios/**")
+                        .hasRole("ADMIN")
 
-                                                // arquivos estáticos
-                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/image/**",
-                                                                "/webjars/**", "/uploads/**")
-                                                .permitAll()
+                        // AA1: imóveis cadastrados e gerenciados pela imobiliária logada.
+                        .requestMatchers(
+                                "/imoveis/cadastrar", "/imoveis/salvar", "/imoveis/editar",
+                                "/imoveis/editar/**", "/imoveis/excluir/**", "/imoveis/meus")
+                        .hasRole("IMOBILIARIA")
 
-                                                // API da AA-2 sem autenticação
-                                                .requestMatchers("/api/**").permitAll()
+                        // Listagem administrativa interna de imóveis. O catálogo público fica liberado acima.
+                        .requestMatchers("/imoveis/listar")
+                        .hasRole("ADMIN")
 
-                                                // listar os imóveis e detalhes sem autenticação
-                                                .requestMatchers("/imoveis/catalogo").permitAll()
+                        // AA1: cliente cria, lista e altera apenas suas propostas em aberto.
+                        .requestMatchers(
+                                "/propostas/cadastrar", "/propostas/salvar", "/propostas/minhas",
+                                "/propostas/editar", "/propostas/editar/**", "/propostas/excluir/**")
+                        .hasRole("CLIENTE")
 
-                                                // imobiliaria
-                                                .requestMatchers("/imoveis/cadastrar", "/imoveis/editar/**",
-                                                                "/imoveis/salvar/**",
-                                                                "/imoveis/excluir/**",
-                                                                "/imoveis/meus")
-                                                .hasRole("IMOBILIARIA")
+                        // AA1: imobiliária avalia propostas dos próprios imóveis.
+                        .requestMatchers("/propostas/imobiliaria", "/propostas/avaliar/**", "/propostas/decidir")
+                        .hasRole("IMOBILIARIA")
 
-                                                // administrador
-                                                .requestMatchers("/clientes/**").hasRole("ADMIN")
-                                                .requestMatchers("/imobiliarias/**").hasRole("ADMIN")
-                                                .requestMatchers("/usuarios/**").hasRole("ADMIN")
-                                                .requestMatchers("/imoveis/**").hasRole("ADMIN")
+                        .requestMatchers("/propostas/listar")
+                        .hasRole("ADMIN")
 
-                                                // cliente
-                                                .requestMatchers("/propostas/minhas", "/propostas/nova/**",
-                                                                "/propostas/salvar")
-                                                .hasRole("CLIENTE")
+                        .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/", true)
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/")
+                        .permitAll())
+                .exceptionHandling(exception -> exception
+                        .accessDeniedPage("/acesso-negado"));
 
-                                                // imobiliária
-                                                .requestMatchers("/propostas/analisar/**", "/imoveis/meus")
-                                                .hasRole("IMOBILIARIA")
-
-                                                // qualquer outra rota exige login
-                                                .anyRequest().authenticated())
-
-                                .formLogin(form -> form
-                                                .loginPage("/login")
-                                                .defaultSuccessUrl("/", true)
-                                                .permitAll())
-
-                                .logout(logout -> logout
-                                                .logoutSuccessUrl("/")
-                                                .permitAll())
-
-                                .exceptionHandling(exception -> exception
-                                                .accessDeniedPage("/acesso-negado"));
-
-                return http.build();
-        }
+        return http.build();
+    }
 }

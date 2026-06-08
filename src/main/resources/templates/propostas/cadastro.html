@@ -1,5 +1,4 @@
 <!doctype html>
-
 <html
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
   xmlns:th="http://www.thymeleaf.org"
@@ -11,41 +10,30 @@
 
   <body>
     <section layout:fragment="content">
-      <div class="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-        <div
-          class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-        >
+      <div class="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div class="flex items-center gap-3">
-            <div
-              class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 text-white"
-            >
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 text-white">
               <ion-icon name="document-text-outline" class="text-xl"></ion-icon>
             </div>
 
             <div>
-              <h1
-                class="text-2xl font-bold text-slate-900"
-                th:text="#{proposta.cadastrar.label}"
-              >
+              <h1 class="text-2xl font-bold text-slate-900" th:text="#{proposta.cadastrar.label}">
                 Cadastrar Proposta
               </h1>
-
-              <p
-                class="mt-1 text-sm text-slate-500"
-                th:text="#{proposta.form.description}"
-              >
+              <p class="mt-1 text-sm text-slate-500" th:text="#{proposta.form.description}">
                 Preencha os dados abaixo para cadastrar ou editar uma proposta.
               </p>
             </div>
           </div>
 
           <a
-            th:href="@{/propostas/listar}"
+            th:href="@{/propostas/minhas}"
             class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100"
             role="button"
           >
             <ion-icon name="list-outline" class="text-lg"></ion-icon>
-            <span th:text="#{proposta.listar.label}">Listar Propostas</span>
+            <span th:text="#{proposta.minhas.label}">Minhas propostas</span>
           </a>
         </div>
 
@@ -58,20 +46,16 @@
             method="POST"
             class="space-y-6"
           >
+            <input type="hidden" th:field="*{id}" />
+
             <div class="grid gap-6 md:grid-cols-2">
               <div>
-                <label
-                  for="valorProposta"
-                  class="mb-1 block text-sm font-medium text-slate-700"
-                  th:text="#{proposta.valor.label}"
-                >
+                <label for="valorProposta" class="mb-1 block text-sm font-medium text-slate-700" th:text="#{proposta.valor.label}">
                   Valor da proposta
                 </label>
 
                 <div class="relative">
-                  <span
-                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-slate-500"
-                  >
+                  <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-slate-500">
                     R$
                   </span>
 
@@ -86,106 +70,21 @@
                   />
                 </div>
 
-                <p
-                  class="mt-1 text-sm text-red-600"
-                  th:if="${#fields.hasErrors('valorProposta')}"
-                  th:errors="*{valorProposta}"
-                ></p>
+                <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('valorProposta')}" th:errors="*{valorProposta}"></p>
               </div>
 
               <div>
-                <label
-                  for="status"
-                  class="mb-1 block text-sm font-medium text-slate-700"
-                  th:text="#{proposta.status.label}"
-                >
-                  Status
-                </label>
-
-                <select
-                  id="status"
-                  th:field="*{status}"
-                  th:classappend="${#fields.hasErrors('status')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
-                  class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-                >
-                  <option value="" th:text="#{select.label}">
-                    Selecione...
-                  </option>
-                  <option value="ABERTO" th:text="#{proposta.status.aberto}">
-                    Aberto
-                  </option>
-                  <option
-                    value="NAO_ACEITO"
-                    th:text="#{proposta.status.naoAceito}"
-                  >
-                    Não aceito
-                  </option>
-                  <option value="ACEITO" th:text="#{proposta.status.aceito}">
-                    Aceito
-                  </option>
-                </select>
-
-                <p
-                  class="mt-1 text-sm text-red-600"
-                  th:if="${#fields.hasErrors('status')}"
-                  th:errors="*{status}"
-                ></p>
-              </div>
-            </div>
-
-            <div class="grid gap-6 md:grid-cols-2">
-              <div>
-                <label
-                  for="cliente"
-                  class="mb-1 block text-sm font-medium text-slate-700"
-                  th:text="#{sidebar.titulo.cliente}"
-                >
-                  Cliente
-                </label>
-
-                <select
-                  id="cliente"
-                  th:field="*{cliente}"
-                  th:classappend="${#fields.hasErrors('cliente')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
-                  class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-                >
-                  <option value="" th:text="#{proposta.cliente.select}">
-                    Selecione um cliente
-                  </option>
-
-                  <option
-                    th:each="cliente : ${clientes}"
-                    th:value="${cliente.id}"
-                    th:text="${cliente.nome}"
-                  ></option>
-                </select>
-
-                <p
-                  class="mt-1 text-sm text-red-600"
-                  th:if="${#fields.hasErrors('cliente')}"
-                  th:errors="*{cliente}"
-                ></p>
-              </div>
-
-              <div>
-                <label
-                  for="imovel"
-                  class="mb-1 block text-sm font-medium text-slate-700"
-                  th:text="#{sidebar.titulo.imovel}"
-                >
+                <label for="imovel" class="mb-1 block text-sm font-medium text-slate-700" th:text="#{sidebar.titulo.imovel}">
                   Imóvel
                 </label>
 
                 <select
                   id="imovel"
-                  th:field="*{imovel}"
+                  th:field="*{imovel.id}"
                   th:classappend="${#fields.hasErrors('imovel')} ? ' border-red-500 focus:border-red-500 focus:ring-red-200'"
                   class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
                 >
-                  <option value="" th:text="#{proposta.imovel.select}">
-                    Selecione um imóvel
-                  </option>
-
+                  <option value="" th:text="#{proposta.imovel.select}">Selecione um imóvel</option>
                   <option
                     th:each="imovel : ${imoveis}"
                     th:value="${imovel.id}"
@@ -193,20 +92,23 @@
                   ></option>
                 </select>
 
-                <p
-                  class="mt-1 text-sm text-red-600"
-                  th:if="${#fields.hasErrors('imovel')}"
-                  th:errors="*{imovel}"
-                ></p>
+                <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('imovel')}" th:errors="*{imovel}"></p>
               </div>
             </div>
 
+            <div th:if="${propostaCompra.id != null}" class="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+              <p>
+                <strong class="text-slate-800">Status:</strong>
+                <span th:text="${propostaCompra.status}">ABERTO</span>
+              </p>
+              <p class="mt-1">
+                <strong class="text-slate-800">Data:</strong>
+                <span th:text="${#temporals.format(propostaCompra.dataProposta, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</span>
+              </p>
+            </div>
+
             <div>
-              <label
-                for="condicoesPagamento"
-                class="mb-1 block text-sm font-medium text-slate-700"
-                th:text="#{proposta.condicoesPagamento.label}"
-              >
+              <label for="condicoesPagamento" class="mb-1 block text-sm font-medium text-slate-700" th:text="#{proposta.condicoesPagamento.label}">
                 Condições de pagamento
               </label>
 
@@ -219,14 +121,8 @@
                 class="block w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
               ></textarea>
 
-              <p
-                class="mt-1 text-sm text-red-600"
-                th:if="${#fields.hasErrors('condicoesPagamento')}"
-                th:errors="*{condicoesPagamento}"
-              ></p>
+              <p class="mt-1 text-sm text-red-600" th:if="${#fields.hasErrors('condicoesPagamento')}" th:errors="*{condicoesPagamento}"></p>
             </div>
-
-            <input type="hidden" id="id" th:field="*{id}" />
 
             <div class="flex justify-end border-t border-slate-200 pt-6">
               <button

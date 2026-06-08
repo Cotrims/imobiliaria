@@ -91,18 +91,10 @@ public class ClienteController {
 
     @PostMapping("/editar")
     public String editar(@Valid Cliente cliente, BindingResult result, RedirectAttributes attr) {
-
-        System.out.println("Entrou no editar");
-        System.out.println("Cliente ID: " + cliente.getId());
-        System.out.println("Usuario: " + cliente.getUsuario());
-        System.out.println("Senha: " + (cliente.getUsuario() != null ? cliente.getUsuario().getPassword() : null));
-
-        result.getFieldErrors()
-                .forEach(error -> System.out.println(error.getField() + " -> " + error.getDefaultMessage()));
-
         if (result.hasErrors()) {
             return "cliente/cadastro";
         }
+
         // Preserva dados do usuário existente quando o formulário não enviar senha
         if (cliente.getId() != null) {
             java.util.Optional<Cliente> opt = service.findById(cliente.getId());
@@ -138,6 +130,7 @@ public class ClienteController {
                 }
             }
         }
+
         service.save(cliente);
 
         attr.addFlashAttribute("sucess", "Cliente editado com sucesso.");
