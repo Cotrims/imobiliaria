@@ -2,6 +2,8 @@ package br.ufscar.dc.dsw.imobiliaria.domain;
 
 import br.ufscar.dc.dsw.imobiliaria.validation.UniqueCPF;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,14 +14,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
@@ -27,20 +24,14 @@ import jakarta.validation.constraints.Size;
 @SuppressWarnings("serial")
 @Entity
 @UniqueCPF
-@Table(name = "Cliente", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "cpf")
-})
-public class Cliente extends AbstractEntity<Long> {
-
-    @Valid
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "usuario_id", nullable = false, unique = true)
-    private Usuario usuario;
+@Table(name = "Cliente")
+@PrimaryKeyJoinColumn(name = "usuario_id")
+public class Cliente extends Usuario {
 
     @CPF
     @NotBlank
     @Column(nullable = false, unique = true)
-    private String cpf;
+    private String CPF;
 
     @NotBlank
     @Size(max = 100, min = 3)
@@ -58,26 +49,26 @@ public class Cliente extends AbstractEntity<Long> {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dataNascimento;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PropostaCompra> propostas = new ArrayList<>();
-
-    @Enumerated(EnumType.STRING)
-    private Role role = Role.ROLE_CLIENTE;
 
     public Cliente() {
     }
 
-    public Cliente(String cpf, String nome,
+    public Cliente(String email, String senha, String CPF, String nome,
             String telefone, String sexo, LocalDate dataNascimento) {
-        this.cpf = cpf;
+        super(email, senha, "ROLE_CLIENTE", true);
+
+        this.CPF = CPF;
         this.nome = nome;
         this.telefone = telefone;
         this.sexo = sexo;
         this.dataNascimento = dataNascimento;
     }
 
-    public String getCpf() {
-        return cpf;
+    public String getCPF() {
+        return CPF;
     }
 
     public String getNome() {
@@ -100,8 +91,8 @@ public class Cliente extends AbstractEntity<Long> {
         return propostas;
     }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public void setCPF(String CPF) {
+        this.CPF = CPF;
     }
 
     public void setNome(String nome) {
@@ -118,13 +109,5 @@ public class Cliente extends AbstractEntity<Long> {
 
     public void setDataNascimento(LocalDate dataNascimento) {
         this.dataNascimento = dataNascimento;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
     }
 }

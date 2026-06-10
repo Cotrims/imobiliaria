@@ -13,7 +13,7 @@
       </div>
 
       <div class="text-sm text-gray-500" sec:authorize="isAuthenticated()">
-        <span th:text="#{login.username}"></span>:
+        <span th:text="#{login.email}"></span>:
         <span sec:authentication="name"></span>
         <span class="mx-1">|</span>
         <span th:text="#{user.role}"></span>:

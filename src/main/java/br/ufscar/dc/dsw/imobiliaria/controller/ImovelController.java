@@ -60,8 +60,8 @@ public class ImovelController {
             return Optional.empty();
         }
 
-        Optional<Usuario> user = usuarioService.findByUsername(auth.getName());
-        return user.flatMap(u -> imobiliariaService.findByUsuarioId(u.getId()));
+        Optional<Usuario> user = usuarioService.findByEmail(auth.getName());
+        return user.flatMap(u -> imobiliariaService.findById(u.getId()));
     }
 
     private boolean pertenceAImobiliariaLogada(Imovel imovel, Imobiliaria imobiliaria) {
@@ -80,7 +80,7 @@ public class ImovelController {
     public String cadastrar(Imovel imovel, ModelMap model, RedirectAttributes attr) {
         Optional<Imobiliaria> imob = imobiliariaLogada();
         if (imob.isEmpty()) {
-            attr.addFlashAttribute("fail", "Usuário autenticado não está vinculado a uma imobiliária.");
+            attr.addFlashAttribute("fail", "imovel.fail.semImobiliaria");
             return "redirect:/";
         }
 
@@ -119,15 +119,13 @@ public class ImovelController {
     public String salvar(
             @Valid Imovel imovel,
             BindingResult result,
-            @RequestParam(value = "fotos", required = false) List<MultipartFile> fotos,
+            @RequestParam(value = "novasFotos", required = false) List<MultipartFile> fotos,
             ModelMap model,
             RedirectAttributes attr) {
 
-        System.out.println("================= INSERIR COM FOTO");
-
         Optional<Imobiliaria> imob = imobiliariaLogada();
         if (imob.isEmpty()) {
-            attr.addFlashAttribute("fail", "Usuário autenticado não está vinculado a uma imobiliária.");
+            attr.addFlashAttribute("fail", "imovel.fail.semImobiliaria");
             return "redirect:/";
         }
 
@@ -135,8 +133,8 @@ public class ImovelController {
 
         int fotoCount = contarFotosEnviadas(fotos);
         if (fotoCount > 10) {
-            result.reject("fotos.max", "Máximo de 10 fotos permitido.");
-            model.addAttribute("fail", "Máximo de 10 fotos permitido.");
+            result.reject("imovel.fail.maxFotos");
+            model.addAttribute("fail", "imovel.fail.maxFotos");
         }
 
         if (result.hasErrors()) {
@@ -147,7 +145,7 @@ public class ImovelController {
         Imovel salvo = service.save(imovel);
         salvarFotos(fotos, salvo);
 
-        attr.addFlashAttribute("sucess", "Imóvel inserido com sucesso.");
+        attr.addFlashAttribute("sucess", "imovel.create.sucess");
         return "redirect:/imoveis/meus";
     }
 
@@ -157,7 +155,7 @@ public class ImovelController {
         Optional<Imovel> opt = service.findById(id);
 
         if (imob.isEmpty() || opt.isEmpty() || !pertenceAImobiliariaLogada(opt.get(), imob.get())) {
-            attr.addFlashAttribute("fail", "Imóvel não encontrado para a imobiliária logada.");
+            attr.addFlashAttribute("fail", "imovel.fail.naoEncontrado");
             return "redirect:/imoveis/meus";
         }
 
@@ -170,7 +168,7 @@ public class ImovelController {
     public String editar(
             @Valid Imovel imovel,
             BindingResult result,
-            @RequestParam(value = "fotos", required = false) List<MultipartFile> fotos,
+            @RequestParam(value = "novasFotos", required = false) List<MultipartFile> fotos,
             @RequestParam(value = "fotosParaExcluir", required = false) List<Long> fotosParaExcluir,
             ModelMap model,
             RedirectAttributes attr) {
@@ -179,7 +177,7 @@ public class ImovelController {
         Optional<Imovel> existente = imovel.getId() == null ? Optional.empty() : service.findById(imovel.getId());
 
         if (imob.isEmpty() || existente.isEmpty() || !pertenceAImobiliariaLogada(existente.get(), imob.get())) {
-            attr.addFlashAttribute("fail", "Imóvel não encontrado para a imobiliária logada.");
+            attr.addFlashAttribute("fail", "imovel.fail.naoEncontrado");
             return "redirect:/imoveis/meus";
         }
 
@@ -190,8 +188,8 @@ public class ImovelController {
         int novas = contarFotosEnviadas(fotos);
 
         if (existentes + novas > 10) {
-            result.reject("fotos.max", "Máximo de 10 fotos permitido.");
-            model.addAttribute("fail", "Máximo de 10 fotos permitido.");
+            result.reject("imovel.fail.maxFotos");
+            model.addAttribute("fail", "imovel.fail.maxFotos");
         }
 
         if (result.hasErrors()) {
@@ -202,10 +200,15 @@ public class ImovelController {
 
         excluirFotosMarcadas(fotosParaExcluir, imovel.getId());
 
+        // Reanexa as fotos remanescentes ao objeto vindo do formulário (que tem a
+        // coleção vazia). Sem isso, o merge com orphanRemoval=true removeria do banco
+        // todas as fotos que não foram marcadas para exclusão.
+        imovel.setFotos(fotoDAO.findByImovelId(imovel.getId()));
+
         Imovel salvo = service.save(imovel);
         salvarFotos(fotos, salvo);
 
-        attr.addFlashAttribute("sucess", "Imóvel editado com sucesso.");
+        attr.addFlashAttribute("sucess", "imovel.edit.sucess");
         return "redirect:/imoveis/meus";
     }
 
@@ -215,14 +218,14 @@ public class ImovelController {
         Optional<Imovel> opt = service.findById(id);
 
         if (imob.isEmpty() || opt.isEmpty() || !pertenceAImobiliariaLogada(opt.get(), imob.get())) {
-            attr.addFlashAttribute("fail", "Imóvel não encontrado para a imobiliária logada.");
+            attr.addFlashAttribute("fail", "imovel.fail.naoEncontrado");
             return "redirect:/imoveis/meus";
         }
 
         fotoDAO.findByImovelId(id).forEach(foto -> excluirArquivo(foto.getNomeArquivo()));
         service.deleteById(id);
 
-        attr.addFlashAttribute("sucess", "Imóvel excluído com sucesso.");
+        attr.addFlashAttribute("sucess", "imovel.delete.sucess");
         return "redirect:/imoveis/meus";
     }
 

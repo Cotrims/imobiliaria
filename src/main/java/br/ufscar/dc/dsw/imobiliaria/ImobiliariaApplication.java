@@ -4,7 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import br.ufscar.dc.dsw.imobiliaria.dao.ICidadeDAO;
 import br.ufscar.dc.dsw.imobiliaria.dao.IClienteDAO;
@@ -32,7 +32,7 @@ public class ImobiliariaApplication {
 			ICidadeDAO cidadeDAO,
 			IPropostaCompraDAO propostaCompraDAO,
 			IUsuarioDAO usuarioDAO,
-			PasswordEncoder encoder,
+			BCryptPasswordEncoder encoder,
 			javax.sql.DataSource dataSource) {
 
 		return (args) -> {
@@ -45,118 +45,62 @@ public class ImobiliariaApplication {
 
 			System.out.println("===== INICIANDO INSERÇÕES NO BANCO DE DADOS =====");
 
-			Usuario ua = new Usuario();
-			ua.setUsername("admin");
-			ua.setPassword(encoder.encode("123"));
-			ua.setRole(Role.ROLE_ADMIN);
-			ua.setEnabled(true);
-			usuarioDAO.save(ua);
+			Usuario admin = new Usuario(
+					"admin@hotmail.com",
+					encoder.encode("123456"),
+					"ROLE_ADMIN",
+					true);
+
+			usuarioDAO.save(admin);
 
 			Cliente cliente = new Cliente(
+					"julio@hotmail.com",
+					encoder.encode("123456"),
 					"123.456.789-09",
-					"João Silva",
+					"Julio Moya",
 					"(16) 99999-9999",
 					"Masculino",
 					LocalDate.of(1998, 5, 20));
 
-			Usuario uc = new Usuario();
-			uc.setUsername("joao@email.com");
-			uc.setPassword(encoder.encode("123"));
-			uc.setRole(Role.ROLE_CLIENTE);
-			uc.setEnabled(true);
-			cliente.setUsuario(uc);
-
 			cliente = clienteDAO.save(cliente);
 
 			Cliente cliente2 = new Cliente(
+					"marina@hotmail.com",
+					encoder.encode("123456"),
 					"234.567.891-73",
-					"Maria Oliveira",
+					"Marina Pena",
 					"(16) 98888-1111",
 					"Feminino",
 					LocalDate.of(1995, 3, 12));
 
-			Usuario uc2 = new Usuario();
-			uc2.setUsername("maria@email.com");
-			uc2.setPassword(encoder.encode("123"));
-			uc2.setRole(Role.ROLE_CLIENTE);
-			uc2.setEnabled(true);
-			cliente2.setUsuario(uc2);
-
 			cliente2 = clienteDAO.save(cliente2);
 
 			Cliente cliente3 = new Cliente(
-					"345.678.912-28",
-					"Pedro Santos",
-					"(16) 97777-2222",
-					"Masculino",
-					LocalDate.of(1990, 9, 8));
-
-			Usuario uc3 = new Usuario();
-			uc3.setUsername("pedro@email.com");
-			uc3.setPassword(encoder.encode("123"));
-			uc3.setRole(Role.ROLE_CLIENTE);
-			uc3.setEnabled(true);
-			cliente3.setUsuario(uc3);
-
-			cliente3 = clienteDAO.save(cliente3);
-
-			Cliente cliente4 = new Cliente(
+					"jader@hotmail.com",
+					encoder.encode("123456"),
 					"456.789.123-64",
-					"Ana Souza",
+					"Jader Vinícius",
 					"(16) 96666-3333",
 					"Feminino",
 					LocalDate.of(2001, 11, 25));
 
-			Usuario uc4 = new Usuario();
-			uc4.setUsername("ana@email.com");
-			uc4.setPassword(encoder.encode("123"));
-			uc4.setRole(Role.ROLE_CLIENTE);
-			uc4.setEnabled(true);
-			cliente4.setUsuario(uc4);
-
-			cliente4 = clienteDAO.save(cliente4);
-
-			Cliente cliente5 = new Cliente(
-					"567.891.234-82",
-					"Lucas Pereira",
-					"(16) 95555-4444",
-					"Masculino",
-					LocalDate.of(1987, 7, 3));
-
-			Usuario uc5 = new Usuario();
-			uc5.setUsername("lucas@email.com");
-			uc5.setPassword(encoder.encode("123"));
-			uc5.setRole(Role.ROLE_CLIENTE);
-			uc5.setEnabled(true);
-			cliente5.setUsuario(uc5);
-
-			cliente5 = clienteDAO.save(cliente5);
+			cliente2 = clienteDAO.save(cliente3);
 
 			Imobiliaria imobiliaria = new Imobiliaria(
+					"cardinali@hotmail.com",
+					encoder.encode("123456"),
 					"11.222.333/0001-81",
-					"Morar Bem Imóveis",
+					"Cardinali",
 					"Imobiliária especializada em casas e apartamentos residenciais.");
-
-			Usuario ui = new Usuario();
-			ui.setUsername("contato@morarbem.com");
-			ui.setPassword(encoder.encode("123"));
-			ui.setRole(Role.ROLE_IMOBILIARIA);
-			ui.setEnabled(true);
-			imobiliaria.setUsuario(ui);
 
 			imobiliaria = imobiliariaDAO.save(imobiliaria);
 
 			Imobiliaria imobiliaria2 = new Imobiliaria(
+					"vitashouse@hotmail.com",
+					encoder.encode("123456"),
 					"22.111.444/0001-37",
-					"Cardinali",
-					"A melhorzinha de São Carlos.");
-
-			Usuario ui2 = new Usuario();
-			ui2.setUsername("cardinali@email.com");
-			ui2.setPassword(encoder.encode("123"));
-			ui2.setRole(Role.ROLE_IMOBILIARIA);
-			ui2.setEnabled(true);
-			imobiliaria2.setUsuario(ui2);
+					"Cada da Vita",
+					"Na casa da Vita vai rolar!");
 
 			imobiliaria2 = imobiliariaDAO.save(imobiliaria2);
 
@@ -286,7 +230,7 @@ public class ImobiliariaApplication {
 			PropostaCompra proposta4 = new PropostaCompra(
 					new BigDecimal("210000.00"),
 					"Proposta com entrada de R$ 50.000,00 e restante financiado.",
-					cliente4,
+					cliente2,
 					imovel4);
 
 			propostaCompraDAO.save(proposta4);
@@ -294,7 +238,7 @@ public class ImobiliariaApplication {
 			PropostaCompra proposta5 = new PropostaCompra(
 					new BigDecimal("600000.00"),
 					"Pagamento com entrada alta e financiamento direto com o banco.",
-					cliente5,
+					cliente2,
 					imovel5);
 
 			propostaCompraDAO.save(proposta5);
@@ -318,7 +262,7 @@ public class ImobiliariaApplication {
 			PropostaCompra proposta8 = new PropostaCompra(
 					new BigDecimal("150000.00"),
 					"Pagamento à vista.",
-					cliente3,
+					cliente,
 					imovel8);
 
 			propostaCompraDAO.save(proposta8);
@@ -326,7 +270,7 @@ public class ImobiliariaApplication {
 			PropostaCompra proposta9 = new PropostaCompra(
 					new BigDecimal("375000.00"),
 					"Entrada de R$ 90.000,00 e financiamento do restante.",
-					cliente4,
+					cliente,
 					imovel9);
 
 			propostaCompraDAO.save(proposta9);
@@ -334,7 +278,7 @@ public class ImobiliariaApplication {
 			PropostaCompra proposta10 = new PropostaCompra(
 					new BigDecimal("395000.00"),
 					"Proposta com pagamento parcelado mediante aprovação bancária.",
-					cliente5,
+					cliente2,
 					imovel10);
 
 			propostaCompraDAO.save(proposta10);

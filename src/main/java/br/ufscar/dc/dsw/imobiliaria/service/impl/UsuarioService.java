@@ -32,8 +32,8 @@ public class UsuarioService implements IUsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Usuario> findByUsername(String username) {
-        return dao.getUserByUsername(username);
+    public Optional<Usuario> findByEmail(String email) {
+        return dao.findByEmail(email);
     }
 
     @Transactional(readOnly = true)

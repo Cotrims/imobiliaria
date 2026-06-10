@@ -59,15 +59,15 @@ public class PropostaCompraController {
         if (auth == null || auth.getName() == null) {
             return Optional.empty();
         }
-        return usuarioService.findByUsername(auth.getName());
+        return usuarioService.findByEmail(auth.getName());
     }
 
     private Optional<Cliente> clienteLogado() {
-        return usuarioLogado().flatMap(user -> clienteService.findByUsuarioId(user.getId()));
+        return usuarioLogado().flatMap(user -> clienteService.findById(user.getId()));
     }
 
     private Optional<Imobiliaria> imobiliariaLogada() {
-        return usuarioLogado().flatMap(user -> imobiliariaService.findByUsuarioId(user.getId()));
+        return usuarioLogado().flatMap(user -> imobiliariaService.findById(user.getId()));
     }
 
     private boolean pertenceAoCliente(PropostaCompra proposta, Cliente cliente) {
@@ -96,7 +96,7 @@ public class PropostaCompraController {
             RedirectAttributes attr) {
 
         if (clienteLogado().isEmpty()) {
-            attr.addFlashAttribute("fail", "Usuário autenticado não está vinculado a um cliente.");
+            attr.addFlashAttribute("fail", "proposta.fail.semCliente");
             return "redirect:/imoveis/catalogo";
         }
 
@@ -139,23 +139,20 @@ public class PropostaCompraController {
 
         Optional<Cliente> clienteOpt = clienteLogado();
         if (clienteOpt.isEmpty()) {
-            attr.addFlashAttribute("fail", "Usuário autenticado não está vinculado a um cliente.");
+            attr.addFlashAttribute("fail", "proposta.fail.semCliente");
             return "redirect:/imoveis/catalogo";
         }
 
         validarCamposEditaveis(proposta, result);
 
+        Optional<Imovel> imovelOpt = Optional.empty();
         if (proposta.getImovel() == null || proposta.getImovel().getId() == null) {
             result.rejectValue("imovel", "NotNull.propostaCompra.imovel", "Selecione um imóvel.");
-        }
-
-        Optional<Imovel> imovelOpt = Optional.empty();
-        if (proposta.getImovel() != null && proposta.getImovel().getId() != null) {
+        } else {
             imovelOpt = imovelService.findById(proposta.getImovel().getId());
-        }
-
-        if (imovelOpt.isEmpty()) {
-            result.rejectValue("imovel", "Invalid.propostaCompra.imovel", "Imóvel inválido.");
+            if (imovelOpt.isEmpty()) {
+                result.rejectValue("imovel", "Invalid.propostaCompra.imovel", "Imóvel inválido.");
+            }
         }
 
         if (result.hasErrors()) {
@@ -170,7 +167,7 @@ public class PropostaCompraController {
         Long imovelId = imovelOpt.get().getId();
 
         if (service.existsByClienteIdAndImovelIdAndStatus(clienteId, imovelId, StatusProposta.ABERTO)) {
-            attr.addFlashAttribute("fail", "Você já possui uma proposta em aberto para este imóvel.");
+            attr.addFlashAttribute("fail", "proposta.fail.duplicada");
             return "redirect:/imoveis/catalogo";
         }
 
@@ -181,7 +178,7 @@ public class PropostaCompraController {
 
         service.save(proposta);
 
-        attr.addFlashAttribute("sucess", "Proposta de compra inserida com sucesso.");
+        attr.addFlashAttribute("sucess", "proposta.create.sucess");
         return "redirect:/propostas/minhas";
     }
 
@@ -194,7 +191,7 @@ public class PropostaCompraController {
                 || propostaOpt.isEmpty()
                 || !pertenceAoCliente(propostaOpt.get(), clienteOpt.get())
                 || propostaOpt.get().getStatus() != StatusProposta.ABERTO) {
-            attr.addFlashAttribute("fail", "Proposta não encontrada ou não está mais aberta para edição.");
+            attr.addFlashAttribute("fail", "proposta.fail.naoEditavel");
             return "redirect:/propostas/minhas";
         }
 
@@ -210,22 +207,20 @@ public class PropostaCompraController {
             RedirectAttributes attr) {
 
         Optional<Cliente> clienteOpt = clienteLogado();
-        Optional<PropostaCompra> existingOpt = proposta.getId() == null ? Optional.empty() : service.findById(proposta.getId());
+        Optional<PropostaCompra> existingOpt = proposta.getId() == null ? Optional.empty()
+                : service.findById(proposta.getId());
 
         if (clienteOpt.isEmpty()
                 || existingOpt.isEmpty()
                 || !pertenceAoCliente(existingOpt.get(), clienteOpt.get())
                 || existingOpt.get().getStatus() != StatusProposta.ABERTO) {
-            attr.addFlashAttribute("fail", "Proposta não encontrada ou não está mais aberta para edição.");
+            attr.addFlashAttribute("fail", "proposta.fail.naoEditavel");
             return "redirect:/propostas/minhas";
         }
 
         validarCamposEditaveis(proposta, result);
 
         if (result.hasErrors()) {
-            if (proposta.getImovel() == null) {
-                proposta.setImovel(existingOpt.get().getImovel());
-            }
             proposta.setCliente(existingOpt.get().getCliente());
             proposta.setImovel(existingOpt.get().getImovel());
             proposta.setDataProposta(existingOpt.get().getDataProposta());
@@ -240,7 +235,7 @@ public class PropostaCompraController {
 
         service.save(existing);
 
-        attr.addFlashAttribute("sucess", "Proposta de compra editada com sucesso.");
+        attr.addFlashAttribute("sucess", "proposta.edit.sucess");
         return "redirect:/propostas/minhas";
     }
 
@@ -253,12 +248,12 @@ public class PropostaCompraController {
                 || existingOpt.isEmpty()
                 || !pertenceAoCliente(existingOpt.get(), clienteOpt.get())
                 || existingOpt.get().getStatus() != StatusProposta.ABERTO) {
-            attr.addFlashAttribute("fail", "Proposta não encontrada ou não está mais aberta para exclusão.");
+            attr.addFlashAttribute("fail", "proposta.fail.naoExcluivel");
             return "redirect:/propostas/minhas";
         }
 
         service.deleteById(id);
-        attr.addFlashAttribute("sucess", "Proposta de compra excluída com sucesso.");
+        attr.addFlashAttribute("sucess", "proposta.delete.sucess");
         return "redirect:/propostas/minhas";
     }
 
@@ -268,7 +263,7 @@ public class PropostaCompraController {
         Optional<PropostaCompra> proposta = service.findById(id);
 
         if (imob.isEmpty() || proposta.isEmpty() || !pertenceAImobiliaria(proposta.get(), imob.get())) {
-            attr.addFlashAttribute("fail", "Proposta não encontrada para a imobiliária logada.");
+            attr.addFlashAttribute("fail", "proposta.fail.naoEncontrada");
             return "redirect:/propostas/imobiliaria";
         }
 
@@ -283,7 +278,7 @@ public class PropostaCompraController {
         Optional<PropostaCompra> propostaOpt = id == null ? Optional.empty() : service.findById(id);
 
         if (imob.isEmpty() || propostaOpt.isEmpty() || !pertenceAImobiliaria(propostaOpt.get(), imob.get())) {
-            attr.addFlashAttribute("fail", "Proposta não encontrada para a imobiliária logada.");
+            attr.addFlashAttribute("fail", "proposta.fail.naoEncontrada");
             return "redirect:/propostas/imobiliaria";
         }
 
@@ -293,19 +288,19 @@ public class PropostaCompraController {
             proposta.setStatus(StatusProposta.NAO_ACEITO);
             service.save(proposta);
             enviarEmailNaoAceito(proposta, contraValor, contraCondicoes);
-            attr.addFlashAttribute("sucess", "Proposta marcada como NÃO ACEITO e cliente notificado.");
+            attr.addFlashAttribute("sucess", "proposta.decisao.naoAceito");
         } else if ("ACEITO".equals(acao)) {
             if (meetingLink == null || meetingLink.isBlank()) {
-                attr.addFlashAttribute("fail", "Informe o link da videoconferência ao aceitar a proposta.");
+                attr.addFlashAttribute("fail", "proposta.fail.semLink");
                 return "redirect:/propostas/avaliar/" + id;
             }
 
             proposta.setStatus(StatusProposta.ACEITO);
             service.save(proposta);
             enviarEmailAceito(proposta, meetingLink, meetingHorario);
-            attr.addFlashAttribute("sucess", "Proposta marcada como ACEITO e cliente notificado.");
+            attr.addFlashAttribute("sucess", "proposta.decisao.aceito");
         } else {
-            attr.addFlashAttribute("fail", "Selecione uma decisão válida.");
+            attr.addFlashAttribute("fail", "proposta.fail.decisaoInvalida");
             return "redirect:/propostas/avaliar/" + id;
         }
 
@@ -317,7 +312,8 @@ public class PropostaCompraController {
         if (valor == null) {
             result.rejectValue("valorProposta", "NotNull.propostaCompra.valorProposta", "Informe o valor da proposta.");
         } else if (valor.compareTo(BigDecimal.ZERO) < 0) {
-            result.rejectValue("valorProposta", "DecimalMin.propostaCompra.valorProposta", "O valor deve ser maior ou igual a zero.");
+            result.rejectValue("valorProposta", "DecimalMin.propostaCompra.valorProposta",
+                    "O valor deve ser maior ou igual a zero.");
         }
 
         if (proposta.getCondicoesPagamento() == null || proposta.getCondicoesPagamento().isBlank()) {
@@ -327,7 +323,7 @@ public class PropostaCompraController {
     }
 
     private void enviarEmailNaoAceito(PropostaCompra proposta, String contraValor, String contraCondicoes) {
-        String to = proposta.getCliente().getUsuario().getUsername();
+        String to = proposta.getCliente().getEmail();
         String subject = "Proposta não aceita — " + proposta.getImovel().getEndereco();
         StringBuilder body = new StringBuilder();
 
@@ -350,7 +346,7 @@ public class PropostaCompraController {
     }
 
     private void enviarEmailAceito(PropostaCompra proposta, String meetingLink, String meetingHorario) {
-        String to = proposta.getCliente().getUsuario().getUsername();
+        String to = proposta.getCliente().getEmail();
         String subject = "Proposta aceita — " + proposta.getImovel().getEndereco();
         StringBuilder body = new StringBuilder();
 

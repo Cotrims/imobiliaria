@@ -1,25 +1,34 @@
-<div th:if="${sucess} != null">
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <i class="bi bi-check-lg"></i>
-    <span> <strong th:text="${sucess}"></strong> </span>
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="alert"
-      aria-label="Close"
-    ></button>
+<div th:fragment="alert">
+  <div th:if="${sucess != null}" class="mb-6">
+    <div
+      class="flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"
+      role="alert"
+    >
+      <ion-icon
+        name="checkmark-circle-outline"
+        class="mt-0.5 text-lg"
+      ></ion-icon>
+      <span th:text="#{${sucess}}">Operação realizada com sucesso.</span>
+    </div>
   </div>
-</div>
 
-<div th:if="${fail} != null">
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <i class="bi bi-exclamation-circle-fill"></i>
-    <span> <strong th:text="${fail}"></strong> </span>
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="alert"
-      aria-label="Close"
-    ></button>
+  <div th:if="${fail != null}" class="mb-6">
+    <div
+      class="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+      role="alert"
+    >
+      <ion-icon name="alert-circle-outline" class="mt-0.5 text-lg"></ion-icon>
+      <span th:text="#{${fail}}">Ocorreu um erro.</span>
+    </div>
+  </div>
+
+  <div th:if="${warning != null}" class="mb-6">
+    <div
+      class="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+      role="alert"
+    >
+      <ion-icon name="warning-outline" class="mt-0.5 text-lg"></ion-icon>
+      <span th:text="#{${warning}}">Aviso.</span>
+    </div>
   </div>
 </div>

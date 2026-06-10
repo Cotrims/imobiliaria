@@ -45,11 +45,12 @@ public class UsuarioController {
             return "usuario/cadastro";
         }
 
+        usuario.setEnabled(true);
         usuario.setPassword(encoder.encode(usuario.getPassword()));
 
         service.save(usuario);
 
-        attr.addFlashAttribute("sucess", "Usuário inserido com sucesso.");
+        attr.addFlashAttribute("sucess", "user.create.sucess");
 
         return "redirect:/usuarios/listar";
     }
@@ -62,45 +63,22 @@ public class UsuarioController {
     }
 
     @PostMapping("/editar")
-    public String editar(@Valid Usuario usuario, BindingResult result, RedirectAttributes attr) {
+    public String editar(@Valid Usuario usuario, BindingResult result, String novoPassword, RedirectAttributes attr) {
 
         if (result.hasErrors()) {
             return "usuario/cadastro";
         }
 
-        if (usuario.getId() != null) {
-            java.util.Optional<Usuario> opt = service.findById(usuario.getId());
-            if (opt.isPresent()) {
-                Usuario usuarioDB = opt.get();
-
-                if (usuario.getUsername() != null && !usuario.getUsername().isBlank()) {
-                    usuarioDB.setUsername(usuario.getUsername());
-                }
-
-                String pass = usuario.getPassword();
-                if (pass != null && !pass.isBlank()) {
-                    if (!pass.startsWith("$2")) {
-                        usuarioDB.setPassword(encoder.encode(pass));
-                    } else {
-                        usuarioDB.setPassword(pass);
-                    }
-                }
-
-                // preserve role/enabled unless changed in the form
-                usuarioDB.setRole(usuario.getRole() != null ? usuario.getRole() : usuarioDB.getRole());
-                usuarioDB.setEnabled(usuario.isEnabled());
-
-                service.save(usuarioDB);
-
-                attr.addFlashAttribute("sucess", "Usuário editado com sucesso.");
-
-                return "redirect:/usuarios/listar";
-            }
+        if (novoPassword != null && !novoPassword.isBlank()) {
+            usuario.setPassword(encoder.encode(novoPassword));
         }
 
-        // fallback: save as-is
+        usuario.setEnabled(true);
+
         service.save(usuario);
-        attr.addFlashAttribute("sucess", "Usuário editado com sucesso.");
+
+        attr.addFlashAttribute("sucess", "user.edit.sucess");
+
         return "redirect:/usuarios/listar";
     }
 
@@ -108,7 +86,7 @@ public class UsuarioController {
     public String excluir(@PathVariable("id") Long id, ModelMap model) {
         service.deleteById(id);
 
-        model.addAttribute("sucess", "Usuário excluído com sucesso.");
+        model.addAttribute("sucess", "user.delete.sucess");
 
         return listar(model);
     }

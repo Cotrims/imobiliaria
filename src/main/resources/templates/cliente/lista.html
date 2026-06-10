@@ -113,6 +113,14 @@
 
                   <th
                     scope="col"
+                    class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    th:text="#{usuario.enabled.label}"
+                  >
+                    Ativo
+                  </th>
+
+                  <th
+                    scope="col"
                     class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500"
                     th:text="#{acao.label}"
                   >
@@ -133,12 +141,12 @@
 
                   <td
                     class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
-                    th:text="${cliente.usuario.username}"
+                    th:text="${cliente.email}"
                   ></td>
 
                   <td
                     class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
-                    th:text="${cliente.cpf}"
+                    th:text="${cliente.CPF}"
                   ></td>
 
                   <td
@@ -160,6 +168,21 @@
                     class="whitespace-nowrap px-4 py-3 text-sm text-slate-600"
                     th:text="${#temporals.format(cliente.dataNascimento, 'dd/MM/yyyy')}"
                   ></td>
+
+                  <td class="whitespace-nowrap px-4 py-3 text-sm">
+                    <span
+                      th:if="${cliente.enabled}"
+                      class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"
+                      th:text="#{status.ativo}"
+                      >Ativo</span
+                    >
+                    <span
+                      th:unless="${cliente.enabled}"
+                      class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600"
+                      th:text="#{status.inativo}"
+                      >Inativo</span
+                    >
+                  </td>
 
                   <td class="whitespace-nowrap px-4 py-3 text-right text-sm">
                     <div class="flex justify-end gap-2">
@@ -194,7 +217,7 @@
 
                 <tr th:if="${#lists.isEmpty(clientes)}">
                   <td
-                    colspan="8"
+                    colspan="9"
                     class="px-4 py-10 text-center text-sm text-slate-500"
                   >
                     <span th:text="#{cliente.lista.vazia}">

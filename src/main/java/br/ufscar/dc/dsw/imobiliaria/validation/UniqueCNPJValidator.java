@@ -39,6 +39,11 @@ public class UniqueCNPJValidator
             return true;
         }
 
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
+                .addPropertyNode("CNPJ")
+                .addConstraintViolation();
+
         return false;
     }
 }

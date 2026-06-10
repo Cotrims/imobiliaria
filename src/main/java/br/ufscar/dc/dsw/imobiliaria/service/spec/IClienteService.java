@@ -8,8 +8,6 @@ import br.ufscar.dc.dsw.imobiliaria.domain.Cliente;
 public interface IClienteService {
     Optional<Cliente> findById(Long id);
 
-    Optional<Cliente> findByUsuarioId(Long usuarioId);
-
     Optional<Cliente> findByNome(String nome);
 
     List<Cliente> findAll();

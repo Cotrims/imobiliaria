@@ -3,18 +3,15 @@ package br.ufscar.dc.dsw.imobiliaria.dao;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import br.ufscar.dc.dsw.imobiliaria.domain.Usuario;
 
 @SuppressWarnings("unchecked")
-public interface IUsuarioDAO extends CrudRepository<Usuario, Long> {
+public interface IUsuarioDAO extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findById(Long id);
 
-    @Query("SELECT u FROM Usuario u WHERE u.username = :username")
-    Optional<Usuario> getUserByUsername(@Param("username") String username);
+    Optional<Usuario> findByEmail(String email);
 
     List<Usuario> findAll();
 

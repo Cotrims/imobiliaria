@@ -9,7 +9,7 @@ public interface IUsuarioService {
 
     Optional<Usuario> findById(Long id);
 
-    Optional<Usuario> findByUsername(String username);
+    Optional<Usuario> findByEmail(String email);
 
     List<Usuario> findAll();
 

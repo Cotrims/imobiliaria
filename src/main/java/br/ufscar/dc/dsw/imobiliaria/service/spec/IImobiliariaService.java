@@ -17,6 +17,4 @@ public interface IImobiliariaService {
     Imobiliaria save(Imobiliaria imobiliaria);
 
     void deleteById(Long id);
-
-    Optional<Imobiliaria> findByUsuarioId(Long usuarioId);
 }

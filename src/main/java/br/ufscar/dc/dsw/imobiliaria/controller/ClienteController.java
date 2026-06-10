@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import br.ufscar.dc.dsw.imobiliaria.domain.Cliente;
-import br.ufscar.dc.dsw.imobiliaria.domain.Usuario;
 import br.ufscar.dc.dsw.imobiliaria.domain.Role;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import br.ufscar.dc.dsw.imobiliaria.service.spec.IClienteService;
 
 @Controller
@@ -26,10 +27,13 @@ public class ClienteController {
     private IClienteService service;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private PasswordEncoder encoder;
 
     @GetMapping("/cadastrar")
     public String cadastrar(Cliente cliente) {
+        if (cliente.getId() == null) {
+            cliente.setEnabled(true);
+        }
         return "cliente/cadastro";
     }
 
@@ -48,36 +52,12 @@ public class ClienteController {
             return "cliente/cadastro";
         }
 
-        if (cliente.getUsuario() != null) {
-            Usuario usuario = cliente.getUsuario();
-            String pass = usuario.getPassword();
-
-            if (pass != null && !pass.isBlank() && !pass.startsWith("$2")) {
-                usuario.setPassword(passwordEncoder.encode(pass));
-            }
-
-            usuario.setRole(Role.ROLE_CLIENTE);
-            usuario.setEnabled(true);
-
-            cliente.setUsuario(usuario);
-        } else {
-            // Caso o formulário não tenha enviado dados de usuário, cria um usuário padrão
-            // usando o CPF como nome de usuário e senha inicial (codificada).
-            Usuario usuario = new Usuario();
-            String defaultUsername = cliente.getCpf();
-            String defaultPassword = cliente.getCpf();
-
-            usuario.setUsername(defaultUsername);
-            usuario.setPassword(passwordEncoder.encode(defaultPassword));
-            usuario.setRole(Role.ROLE_CLIENTE);
-            usuario.setEnabled(true);
-
-            cliente.setUsuario(usuario);
-        }
+        cliente.setRole(Role.ROLE_CLIENTE);
+        cliente.setPassword(encoder.encode(cliente.getPassword()));
 
         service.save(cliente);
 
-        attr.addFlashAttribute("sucess", "Cliente inserido com sucesso.");
+        attr.addFlashAttribute("sucess", "client.create.sucess");
 
         return "redirect:/clientes/listar";
     }
@@ -90,64 +70,30 @@ public class ClienteController {
     }
 
     @PostMapping("/editar")
-    public String editar(@Valid Cliente cliente, BindingResult result, RedirectAttributes attr) {
+    public String editar(@Valid Cliente cliente, BindingResult result, String novoPassword, RedirectAttributes attr) {
         if (result.hasErrors()) {
             return "cliente/cadastro";
         }
 
-        // Preserva dados do usuário existente quando o formulário não enviar senha
-        if (cliente.getId() != null) {
-            java.util.Optional<Cliente> opt = service.findById(cliente.getId());
-            if (opt.isPresent()) {
-                Cliente clienteDB = opt.get();
-
-                if (cliente.getUsuario() != null) {
-                    Usuario usuarioForm = cliente.getUsuario();
-                    Usuario usuarioDB = clienteDB.getUsuario();
-
-                    // Atualiza username apenas se fornecido
-                    if (usuarioForm.getUsername() != null && !usuarioForm.getUsername().isBlank()) {
-                        usuarioDB.setUsername(usuarioForm.getUsername());
-                    }
-
-                    // Atualiza senha apenas se fornecida
-                    String pass = usuarioForm.getPassword();
-                    if (pass != null && !pass.isBlank()) {
-                        if (!pass.startsWith("$2")) {
-                            usuarioDB.setPassword(passwordEncoder.encode(pass));
-                        } else {
-                            usuarioDB.setPassword(pass);
-                        }
-                    }
-
-                    usuarioDB.setRole(Role.ROLE_CLIENTE);
-                    usuarioDB.setEnabled(true);
-
-                    cliente.setUsuario(usuarioDB);
-                } else {
-                    // Mantém o usuário atual se o formulário não enviou dados
-                    cliente.setUsuario(clienteDB.getUsuario());
-                }
-            }
+        if (novoPassword != null && !novoPassword.isBlank()) {
+            cliente.setPassword(encoder.encode(novoPassword));
         }
+
+        cliente.setRole(Role.ROLE_CLIENTE);
 
         service.save(cliente);
 
-        attr.addFlashAttribute("sucess", "Cliente editado com sucesso.");
+        attr.addFlashAttribute("sucess", "client.edit.sucess");
 
         return "redirect:/clientes/listar";
     }
 
     @GetMapping("/excluir/{id}")
     public String excluir(@PathVariable("id") Long id, ModelMap model) {
-        // if (service.imobiliariaTemLivros(id)) {
-        // model.addAttribute("fail", "Imobiliaria não excluída. Possui livro(s)
-        // vinculado(s).");
-        // } else {
         service.deleteById(id);
 
-        model.addAttribute("sucess", "Cliente excluído com sucesso.");
-        // }
+        model.addAttribute("sucess", "client.delete.sucess");
+
         return listar(model);
     }
 }

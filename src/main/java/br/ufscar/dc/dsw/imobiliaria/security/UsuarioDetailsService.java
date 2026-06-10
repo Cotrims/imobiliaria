@@ -10,18 +10,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import br.ufscar.dc.dsw.imobiliaria.dao.IUsuarioDAO;
 import br.ufscar.dc.dsw.imobiliaria.domain.Usuario;
 
-public class UsuarioDetailsServiceImpl implements UserDetailsService {
+public class UsuarioDetailsService implements UserDetailsService {
 
     @Autowired
-    private IUsuarioDAO dao;
+    private IUsuarioDAO usuarioDAO;
 
     @Override
-    public UserDetails loadUserByUsername(String username)
+    public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
-        Optional<Usuario> usuario = dao.getUserByUsername(username);
+        Optional<Usuario> usuario = usuarioDAO.findByEmail(email);
 
         if (usuario.isEmpty()) {
-            throw new UsernameNotFoundException("Could not find user");
+            throw new UsernameNotFoundException("Could not find user: " + email);
         }
 
         return new UsuarioDetails(usuario.get());

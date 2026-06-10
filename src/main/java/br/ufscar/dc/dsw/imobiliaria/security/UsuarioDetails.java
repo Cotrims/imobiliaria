@@ -24,13 +24,18 @@ public class UsuarioDetails implements UserDetails {
     }
 
     @Override
+    public String getUsername() {
+        return usuario.getEmail();
+    }
+
+    @Override
     public String getPassword() {
         return usuario.getPassword();
     }
 
     @Override
-    public String getUsername() {
-        return usuario.getUsername();
+    public boolean isEnabled() {
+        return usuario.isEnabled();
     }
 
     public Usuario getUsuario() {

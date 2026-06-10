@@ -12,7 +12,7 @@ import jakarta.validation.Payload;
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UniqueCPF {
-    String message() default "CPF is already registered";
+    String message() default "{cliente.cpf.unique}";
 
     Class<?>[] groups() default {};
 

@@ -115,17 +115,19 @@
             th:each="imovel : ${imoveis}"
             class="rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
           >
-            <div class="relative bg-slate-700">
+            <div
+              class="relative aspect-[4/3] w-full overflow-hidden rounded-t-2xl bg-slate-100"
+            >
               <img
                 th:if="${not #lists.isEmpty(imovel.fotos)}"
                 th:src="@{/uploads/{n}(n=${imovel.fotos[0].nomeArquivo})}"
                 th:alt="${imovel.endereco}"
-                class="h-full w-full object-cover"
+                class="absolute inset-0 h-full w-full object-cover"
               />
 
               <div
                 th:if="${#lists.isEmpty(imovel.fotos)}"
-                class="p-6 flex h-full w-full flex-col items-center justify-center gap-2 text-slate-400"
+                class="absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-400"
               >
                 <ion-icon name="image-outline" class="text-5xl"></ion-icon>
                 <span class="text-sm" th:text="#{imovel.catalogo.semFoto}"
@@ -134,7 +136,7 @@
               </div>
 
               <div
-                class="p-6 absolute bottom-3 left-3 rounded-lg bg-slate-900/90 px-3 py-2 text-sm font-bold text-white shadow-sm"
+                class="absolute bottom-3 left-3 rounded-lg bg-slate-900/90 px-3 py-2 text-sm font-bold text-white shadow-sm"
                 th:text="${#numbers.formatCurrency(imovel.valor)}"
               >
                 R$ 0,00

@@ -39,11 +39,6 @@ public class ImobiliariaService implements IImobiliariaService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Imobiliaria> findByUsuarioId(Long usuarioId) {
-        return dao.findByUsuarioId(usuarioId);
-    }
-
-    @Transactional(readOnly = true)
     public Optional<Imobiliaria> findByCNPJ(String CNPJ) {
         return dao.findByCNPJ(CNPJ);
     }

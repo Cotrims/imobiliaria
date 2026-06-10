@@ -205,7 +205,7 @@
                       </div>
 
                       <div
-                        th:if="${#authentication.name == propostaCompra.cliente.usuario.username and propostaCompra.status.name() == 'ABERTO'}"
+                        th:if="${#authentication.name == propostaCompra.cliente.email and propostaCompra.status.name() == 'ABERTO'}"
                       >
                         <a
                           th:href="@{/propostas/editar/{id}(id=${propostaCompra.id})}"

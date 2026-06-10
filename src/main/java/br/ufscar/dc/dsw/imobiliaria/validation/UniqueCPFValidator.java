@@ -22,11 +22,12 @@ public class UniqueCPFValidator implements ConstraintValidator<UniqueCPF, Client
             return true;
         }
 
-        if (value == null || value.getCpf() == null) {
+        if (value == null || value.getCPF() == null) {
             return true;
         }
 
-        Optional<Cliente> existing = dao.findByCpf(value.getCpf());
+        Optional<Cliente> existing = dao.findByCPF(value.getCPF());
+
         if (existing.isEmpty()) {
             return true;
         }
@@ -34,6 +35,11 @@ public class UniqueCPFValidator implements ConstraintValidator<UniqueCPF, Client
         if (value.getId() != null && value.getId().equals(existing.get().getId())) {
             return true;
         }
+
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
+                .addPropertyNode("CPF")
+                .addConstraintViolation();
 
         return false;
     }

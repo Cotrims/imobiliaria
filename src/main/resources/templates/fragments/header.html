@@ -49,15 +49,15 @@
     </div>
 
     <div class="hidden items-center gap-3 md:flex">
-      <a th:href="@{/(lang='pt')}" class="rounded hover:opacity-80">
+      <a th:href="${urlPt} ?: @{/(lang='pt')}" class="rounded hover:opacity-80">
         <span class="fi fi-br"></span>
       </a>
 
-      <a th:href="@{/(lang='en')}" class="rounded hover:opacity-80">
+      <a th:href="${urlEn} ?: @{/(lang='en')}" class="rounded hover:opacity-80">
         <span class="fi fi-us" title="EN"></span>
       </a>
 
-      <a th:href="@{/(lang='jp')}" class="rounded hover:opacity-80">
+      <a th:href="${urlJp} ?: @{/(lang='jp')}" class="rounded hover:opacity-80">
         <span class="fi fi-jp" title="JP"></span>
       </a>
 
@@ -115,15 +115,15 @@
       ></div>
 
       <div class="mt-3 flex items-center gap-3 px-3">
-        <a th:href="@{/(lang='pt')}" class="rounded hover:opacity-80">
+        <a th:href="${urlPt} ?: @{/(lang='pt')}" class="rounded hover:opacity-80">
           <span class="fi fi-br"></span>
         </a>
 
-        <a th:href="@{/(lang='en')}" class="rounded hover:opacity-80">
+        <a th:href="${urlEn} ?: @{/(lang='en')}" class="rounded hover:opacity-80">
           <span class="fi fi-us" title="EN"></span>
         </a>
 
-        <a th:href="@{/(lang='jp')}" class="rounded hover:opacity-80">
+        <a th:href="${urlJp} ?: @{/(lang='jp')}" class="rounded hover:opacity-80">
           <span class="fi fi-jp" title="JP"></span>
         </a>
       </div>

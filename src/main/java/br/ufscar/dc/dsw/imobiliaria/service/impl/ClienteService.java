@@ -34,11 +34,6 @@ public class ClienteService implements IClienteService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Cliente> findByUsuarioId(Long usuarioId) {
-        return dao.findByUsuarioId(usuarioId);
-    }
-
-    @Transactional(readOnly = true)
     public Optional<Cliente> findById(Long id) {
         return dao.findById(id);
     }
