@@ -66,9 +66,17 @@ public class ImobiliariaRestController {
             imobiliaria.setPassword(encoder.encode((String) json.get("password")));
         }
 
-        imobiliaria.setCNPJ((String) json.get("CNPJ"));
-        imobiliaria.setNome((String) json.get("nome"));
-        imobiliaria.setDescricao((String) json.get("descricao"));
+        if (json.get("CNPJ") != null) {
+            imobiliaria.setCNPJ((String) json.get("CNPJ"));
+        }
+
+        if (json.get("nome") != null) {
+            imobiliaria.setNome((String) json.get("nome"));
+        }
+
+        if (json.get("descricao") != null) {
+            imobiliaria.setDescricao((String) json.get("descricao"));
+        }
     }
 
     @GetMapping
@@ -100,7 +108,9 @@ public class ImobiliariaRestController {
             if (isJSONValid(json.toJSONString())) {
                 Imobiliaria imobiliaria = new Imobiliaria();
 
+                System.out.println("JSON" + json);
                 parse(imobiliaria, json);
+
                 imobiliaria.setRole(Role.ROLE_IMOBILIARIA);
                 imobiliaria.setEnabled(true);
 

@@ -67,19 +67,31 @@ public class ClienteRestController {
             cliente.setPassword(encoder.encode((String) json.get("password")));
         }
 
-        cliente.setNome((String) json.get("nome"));
-        cliente.setCPF((String) json.get("CPF"));
-        cliente.setSexo((String) json.get("sexo"));
-        cliente.setTelefone((String) json.get("telefone"));
+        if (json.get("nome") != null) {
+            cliente.setNome((String) json.get("nome"));
+        }
+
+        if (json.get("CPF") != null) {
+            cliente.setCPF((String) json.get("CPF"));
+        }
+
+        if (json.get("sexo") != null) {
+            cliente.setSexo((String) json.get("sexo"));
+        }
+
+        if (json.get("telefone") != null) {
+            cliente.setTelefone((String) json.get("telefone"));
+        }
 
         Object dataNascimento = json.get("dataNascimento");
+
         if (dataNascimento != null) {
             cliente.setDataNascimento(LocalDate.parse(dataNascimento.toString()));
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<Cliente>> lista() {
+    public ResponseEntity<List<Cliente>> findAll() {
         List<Cliente> lista = service.findAll();
 
         if (lista.isEmpty()) {
@@ -90,7 +102,7 @@ public class ClienteRestController {
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<Cliente> lista(@PathVariable("id") long id) {
+    public ResponseEntity<Cliente> findById(@PathVariable("id") long id) {
         Optional<Cliente> cliente = service.findById(id);
 
         if (cliente.isEmpty()) {
@@ -102,12 +114,15 @@ public class ClienteRestController {
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<Cliente> cria(@Valid @RequestBody JSONObject json, BindingResult result) {
+    public ResponseEntity<Cliente> crate(@Valid @RequestBody JSONObject json, BindingResult result) {
         try {
             if (isJSONValid(json.toJSONString())) {
+                System.out.println("EH VALIDO E ENTROU");
+
                 Cliente cliente = new Cliente();
 
                 parse(cliente, json);
+
                 cliente.setRole(Role.ROLE_CLIENTE);
                 cliente.setEnabled(true);
 
@@ -124,7 +139,7 @@ public class ClienteRestController {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<Cliente> atualiza(@PathVariable("id") long id, @RequestBody JSONObject json) {
+    public ResponseEntity<Cliente> update(@PathVariable("id") long id, @RequestBody JSONObject json) {
         try {
             if (isJSONValid(json.toString())) {
                 Cliente cliente = service.findById(id).get();
@@ -141,12 +156,13 @@ public class ClienteRestController {
                 return ResponseEntity.badRequest().body(null);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(null);
         }
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Boolean> remove(@PathVariable("id") long id) {
+    public ResponseEntity<Boolean> delete(@PathVariable("id") long id) {
 
         Optional<Cliente> cliente = service.findById(id);
 
