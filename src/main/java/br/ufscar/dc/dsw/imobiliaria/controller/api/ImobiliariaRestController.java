@@ -80,7 +80,7 @@ public class ImobiliariaRestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Imobiliaria>> lista() {
+    public ResponseEntity<List<Imobiliaria>> findAll() {
         List<Imobiliaria> lista = service.findAll();
 
         if (lista.isEmpty()) {
@@ -91,7 +91,7 @@ public class ImobiliariaRestController {
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<Imobiliaria> lista(@PathVariable("id") long id) {
+    public ResponseEntity<Imobiliaria> findById(@PathVariable("id") long id) {
         Optional<Imobiliaria> imobiliaria = service.findById(id);
 
         if (imobiliaria.isEmpty()) {
@@ -103,7 +103,7 @@ public class ImobiliariaRestController {
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<Imobiliaria> cria(@Valid @RequestBody JSONObject json, BindingResult result) {
+    public ResponseEntity<Imobiliaria> create(@Valid @RequestBody JSONObject json, BindingResult result) {
         try {
             if (isJSONValid(json.toJSONString())) {
                 Imobiliaria imobiliaria = new Imobiliaria();
@@ -127,7 +127,7 @@ public class ImobiliariaRestController {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<Imobiliaria> atualiza(@PathVariable("id") long id, @RequestBody JSONObject json) {
+    public ResponseEntity<Imobiliaria> update(@PathVariable("id") long id, @RequestBody JSONObject json) {
         try {
             if (isJSONValid(json.toString())) {
                 Optional<Imobiliaria> optional = service.findById(id);
@@ -151,7 +151,7 @@ public class ImobiliariaRestController {
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Boolean> remove(@PathVariable("id") long id) {
+    public ResponseEntity<Boolean> delete(@PathVariable("id") long id) {
 
         Optional<Imobiliaria> imobiliaria = service.findById(id);
 

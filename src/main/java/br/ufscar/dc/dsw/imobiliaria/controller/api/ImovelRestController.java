@@ -64,12 +64,16 @@ public class ImovelRestController {
             }
         }
 
-        imovel.setEndereco((String) json.get("endereco"));
-        imovel.setDescricao((String) json.get("descricao"));
+        if (json.get("endereco") != null) {
+            imovel.setEndereco((String) json.get("endereco"));
+        }
 
-        Object valor = json.get("valor");
-        if (valor != null) {
-            imovel.setValor(new BigDecimal(valor.toString()));
+        if (json.get("descricao") != null) {
+            imovel.setDescricao((String) json.get("descricao"));
+        }
+
+        if (json.get("valor") != null) {
+            imovel.setValor(new BigDecimal(json.get("valor").toString()));
         }
 
         Object cidadeId = json.get("cidadeId");
@@ -85,9 +89,8 @@ public class ImovelRestController {
         }
     }
 
-    // GET /api/imoveis -- lista de imóveis (à venda)
     @GetMapping
-    public ResponseEntity<List<Imovel>> lista() {
+    public ResponseEntity<List<Imovel>> findAll() {
         List<Imovel> lista = service.findAll();
 
         if (lista.isEmpty()) {
@@ -97,9 +100,8 @@ public class ImovelRestController {
         return ResponseEntity.ok(lista);
     }
 
-    // GET /api/imoveis/{id} -- imóvel (à venda) de id = {id}
     @GetMapping(path = "/{id}")
-    public ResponseEntity<Imovel> lista(@PathVariable("id") Long id) {
+    public ResponseEntity<Imovel> findById(@PathVariable("id") Long id) {
         Optional<Imovel> imovel = service.findById(id);
 
         if (imovel.isEmpty()) {
@@ -109,10 +111,8 @@ public class ImovelRestController {
         return ResponseEntity.ok(imovel.get());
     }
 
-    // GET /api/imoveis/cidades/{nome} -- imóveis (à venda) da cidade de nome =
-    // {nome}
     @GetMapping(path = "/cidades/{nome}")
-    public ResponseEntity<List<Imovel>> listaPorCidade(@PathVariable("nome") String nome) {
+    public ResponseEntity<List<Imovel>> findByCidade(@PathVariable("nome") String nome) {
         List<Imovel> lista = service.findByCidadeNome(nome);
 
         if (lista.isEmpty()) {
@@ -122,10 +122,8 @@ public class ImovelRestController {
         return ResponseEntity.ok(lista);
     }
 
-    // GET /api/imoveis/imobiliarias/{id} -- imóveis (à venda) da imobiliária de id
-    // = {id}
     @GetMapping(path = "/imobiliarias/{id}")
-    public ResponseEntity<List<Imovel>> listaPorImobiliaria(@PathVariable("id") Long id) {
+    public ResponseEntity<List<Imovel>> findByAgency(@PathVariable("id") Long id) {
         List<Imovel> lista = service.findByImobiliariaId(id);
 
         if (lista.isEmpty()) {
@@ -133,63 +131,5 @@ public class ImovelRestController {
         }
 
         return ResponseEntity.ok(lista);
-    }
-
-    @PostMapping
-    @ResponseBody
-    public ResponseEntity<Imovel> cria(@Valid @RequestBody JSONObject json, BindingResult result) {
-        try {
-            if (isJSONValid(json.toJSONString())) {
-                Imovel imovel = new Imovel();
-
-                parse(imovel, json);
-
-                service.save(imovel);
-
-                return ResponseEntity.ok(imovel);
-            } else {
-                return ResponseEntity.badRequest().body(null);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(null);
-        }
-    }
-
-    @PutMapping(path = "/{id}")
-    public ResponseEntity<Imovel> atualiza(@PathVariable("id") Long id, @RequestBody JSONObject json) {
-        try {
-            if (isJSONValid(json.toString())) {
-                Optional<Imovel> optional = service.findById(id);
-
-                if (optional.isEmpty())
-                    return ResponseEntity.notFound().build();
-
-                Imovel imovel = optional.get();
-
-                parse(imovel, json);
-
-                service.save(imovel);
-
-                return ResponseEntity.ok(imovel);
-            } else {
-                return ResponseEntity.badRequest().body(null);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(null);
-        }
-    }
-
-    @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Boolean> remove(@PathVariable("id") Long id) {
-
-        Optional<Imovel> imovel = service.findById(id);
-
-        if (imovel.isEmpty())
-            return ResponseEntity.notFound().build();
-
-        service.deleteById(id);
-
-        return ResponseEntity.noContent().build();
     }
 }
