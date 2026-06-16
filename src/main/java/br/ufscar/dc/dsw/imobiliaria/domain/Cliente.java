@@ -19,6 +19,7 @@ import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @SuppressWarnings("serial")
@@ -39,6 +40,7 @@ public class Cliente extends Usuario {
     private String nome;
 
     @NotBlank
+    @Pattern(regexp = "\\(\\d{2}\\) \\d{4,5}-\\d{4}", message = "{cliente.telefone.invalido}")
     @Column(nullable = false)
     private String telefone;
 
