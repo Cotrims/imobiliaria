@@ -84,7 +84,18 @@ public class ImobiliariaApplication {
 					"Feminino",
 					LocalDate.of(2001, 11, 25));
 
-			cliente2 = clienteDAO.save(cliente3);
+			cliente3 = clienteDAO.save(cliente3);
+
+			Cliente eu = new Cliente(
+					"vini.cotrim@hotmail.com",
+					encoder.encode("123456"),
+					"458.728.118-29",
+					"Vinícius Cotrim",
+					"(16) 98942-2424",
+					"Masculino",
+					LocalDate.of(2004, 12, 02));
+
+			eu = clienteDAO.save(eu);
 
 			Imobiliaria imobiliaria = new Imobiliaria(
 					"cardinali@hotmail.com",
@@ -99,8 +110,8 @@ public class ImobiliariaApplication {
 					"vitashouse@hotmail.com",
 					encoder.encode("123456"),
 					"22.111.444/0001-37",
-					"Cada da Vita",
-					"Na casa da Vita vai rolar!");
+					"Casa da Vita",
+					"Na casa da Vita vai rolar uma compra!");
 
 			imobiliaria2 = imobiliariaDAO.save(imobiliaria2);
 
@@ -206,7 +217,7 @@ public class ImobiliariaApplication {
 			PropostaCompra proposta = new PropostaCompra(
 					new BigDecimal("430000.00"),
 					"Entrada de R$ 100.000,00 e restante financiado.",
-					cliente,
+					eu,
 					imovel);
 
 			propostaCompraDAO.save(proposta);
