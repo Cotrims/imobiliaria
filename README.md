@@ -146,114 +146,65 @@ java -jar target/imobiliaria-0.0.1-SNAPSHOT.jar
 
 ---
 
-## 6. Rotas da aplicação
+## 6. API REST (`/api/**`)
 
-A aplicação expõe dois conjuntos de rotas:
+Além das páginas web (Spring MVC + Thymeleaf, protegidas por login de
+formulário), a aplicação expõe uma **API REST** em `/api/**`. Esses endpoints:
 
-- **Rotas web (Spring MVC + Thymeleaf):** retornam páginas HTML, exigem login
-  por formulário (sessão) e respeitam as roles da seção 3.
-- **Rotas REST (`/api/**`):** retornam/recebem JSON, estão liberadas no
-  `WebSecurityConfig` (`permitAll`) e aceitam CORS (`@CrossOrigin`). Úteis para
-  consumo por clientes externos (ex.: Postman, front-ends, scripts).
+- Retornam/recebem **JSON**.
+- Estão **liberados** no `WebSecurityConfig` (`permitAll`, sem login).
+- Aceitam **CORS** (`@CrossOrigin`), permitindo consumo por front-ends e scripts
+  externos.
 
-> Em todas as tabelas, `{id}` é o identificador numérico da entidade.
+São os endpoints ideais para consumo por clientes externos (ex.: Postman,
+front-ends SPA, scripts). O código-fonte está em
+[controller/api/](src/main/java/br/ufscar/dc/dsw/imobiliaria/controller/api/).
 
-### 6.1. Rotas públicas / autenticação
+**Convenções gerais:**
 
-| Método | Rota               | Acesso  | Descrição                                                       |
-| ------ | ------------------ | ------- | --------------------------------------------------------------- |
-| GET    | `/`                | público | Página inicial (`home`).                                        |
-| GET    | `/login`           | público | Formulário de login. Campos: `email` e `password`.             |
-| POST   | `/login`           | público | Autentica (processado pelo Spring Security). Sucesso → `/`.     |
-| POST   | `/logout`          | logado  | Encerra a sessão. Sucesso → `/`.                                |
-| GET    | `/acesso-negado`   | público | Página exibida quando falta permissão (HTTP 403).               |
-| GET    | `/imoveis/catalogo`| público | Catálogo de imóveis. Filtro opcional `?cidade=NomeDaCidade`.    |
+- `{id}` é o identificador numérico (Long) da entidade.
+- Respostas com corpo usam `Content-Type: application/json`.
+- **Listas vazias retornam HTTP 404** (e não 200 com `[]`).
+- Requisições com corpo (`POST`/`PUT`) exigem `Content-Type: application/json`.
+- Base URL padrão em desenvolvimento: `http://localhost:8080`.
 
-**Exemplo de login (form):**
+### 6.1. Imóveis — `/api/imoveis` (somente leitura)
 
-```http
-POST /login
-Content-Type: application/x-www-form-urlencoded
+| Método | Rota                             | Descrição                          | Sucesso | Falha           |
+| ------ | -------------------------------- | ---------------------------------- | ------- | --------------- |
+| GET    | `/api/imoveis`                   | Lista todos os imóveis.            | 200     | 404 (vazio)     |
+| GET    | `/api/imoveis/{id}`              | Busca um imóvel por id.            | 200     | 404 (não achou) |
+| GET    | `/api/imoveis/cidades/{nome}`    | Imóveis de uma cidade (pelo nome). | 200     | 404 (vazio)     |
+| GET    | `/api/imoveis/imobiliarias/{id}` | Imóveis de uma imobiliária.        | 200     | 404 (vazio)     |
 
-email=admin@hotmail.com&password=123456
-```
+Cada imóvel retornado inclui endereço, cidade, descrição, preço, a imobiliária
+dona e a lista de fotos associadas.
 
-### 6.2. Rotas web — Imóveis (`/imoveis`)
+### 6.2. Clientes — `/api/clientes` e Imobiliárias — `/api/imobiliarias` (CRUD completo)
 
-| Método | Rota                     | Role        | Descrição                                              |
-| ------ | ------------------------ | ----------- | ------------------------------------------------------ |
-| GET    | `/imoveis/catalogo`      | público     | Catálogo público (aceita `?cidade=`).                  |
-| GET    | `/imoveis/listar`        | ADMIN       | Listagem administrativa de todos os imóveis.           |
-| GET    | `/imoveis/meus`          | IMOBILIARIA | Imóveis da imobiliária logada.                         |
-| GET    | `/imoveis/cadastrar`     | IMOBILIARIA | Formulário de cadastro de imóvel.                      |
-| POST   | `/imoveis/salvar`        | IMOBILIARIA | Salva novo imóvel. Aceita upload `novasFotos` (máx 10).|
-| GET    | `/imoveis/editar/{id}`   | IMOBILIARIA | Formulário de edição (apenas imóveis próprios).        |
-| POST   | `/imoveis/editar`        | IMOBILIARIA | Atualiza o imóvel. `fotosParaExcluir` remove fotos.    |
-| GET    | `/imoveis/excluir/{id}`  | IMOBILIARIA | Exclui o imóvel próprio e suas fotos.                  |
+Os dois recursos seguem exatamente o mesmo padrão de rotas. Substitua
+`{recurso}` por `clientes` ou `imobiliarias`:
 
-> As rotas de cadastro/edição usam `multipart/form-data` por causa do upload de
-> fotos (campo `novasFotos`, máx. 10 imagens de 5 MB cada).
+| Método | Rota                  | Descrição                                          | Sucesso | Falha           |
+| ------ | --------------------- | -------------------------------------------------- | ------- | --------------- |
+| GET    | `/api/{recurso}`      | Lista todos os registros.                          | 200     | 404 (vazio)     |
+| GET    | `/api/{recurso}/{id}` | Busca um registro por id.                          | 200     | 404 (não achou) |
+| POST   | `/api/{recurso}`      | Cria um registro (a role é definida automaticamente). | 201/200 | 400 (inválido) |
+| PUT    | `/api/{recurso}/{id}` | Atualiza parcialmente (campos enviados sobrescrevem). | 200     | 404 (não achou) |
+| DELETE | `/api/{recurso}/{id}` | Remove o registro.                                 | 204     | 404 (não achou) |
 
-### 6.3. Rotas web — Propostas de compra (`/propostas`)
+**Campos JSON aceitos:**
 
-| Método | Rota                       | Role        | Descrição                                                 |
-| ------ | -------------------------- | ----------- | --------------------------------------------------------- |
-| GET    | `/propostas/cadastrar`     | CLIENTE     | Formulário de proposta. Aceita `?imovelId=` para pré-seleção. |
-| POST   | `/propostas/salvar`        | CLIENTE     | Cria proposta (status `ABERTO`). Bloqueia duplicadas.     |
-| GET    | `/propostas/minhas`        | CLIENTE     | Propostas do cliente logado.                              |
-| GET    | `/propostas/editar/{id}`   | CLIENTE     | Edita proposta própria em aberto.                         |
-| POST   | `/propostas/editar`        | CLIENTE     | Atualiza valor/condições da proposta em aberto.           |
-| GET    | `/propostas/excluir/{id}`  | CLIENTE     | Exclui proposta própria em aberto.                        |
-| GET    | `/propostas/listar`        | ADMIN       | Listagem administrativa de todas as propostas.            |
-| GET    | `/propostas/imobiliaria`   | IMOBILIARIA | Propostas recebidas nos imóveis da imobiliária.           |
-| GET    | `/propostas/avaliar/{id}`  | IMOBILIARIA | Tela para avaliar uma proposta recebida.                  |
-| POST   | `/propostas/decidir`       | IMOBILIARIA | Decide a proposta. Campos: `id`, `acao` (`ACEITO`/`NAO_ACEITO`), e — quando `ACEITO` — `meetingLink`, `meetingHorario`; quando `NAO_ACEITO`, contraproposta opcional `contraValor`/`contraCondicoes`. Envia e-mail ao cliente. |
+| Recurso         | Campos                                                                          |
+| --------------- | ------------------------------------------------------------------------------ |
+| **Cliente**     | `nome`, `email`, `password`, `CPF`, `sexo`, `telefone`, `dataNascimento` (`AAAA-MM-DD`) |
+| **Imobiliária** | `nome`, `email`, `password`, `CNPJ`, `descricao`                               |
 
-### 6.4. Rotas web — Administração (somente ADMIN)
+> No `POST`, a `role` (`ROLE_CLIENTE` / `ROLE_IMOBILIARIA`) é atribuída
+> automaticamente conforme o endpoint — não precisa ser enviada no corpo.
+> No `PUT`, apenas os campos presentes no JSON são sobrescritos.
 
-CRUD com o mesmo padrão de rotas para **Clientes** (`/clientes`), **Imobiliárias**
-(`/imobiliarias`) e **Usuários** (`/usuarios`):
-
-| Método | Rota                       | Descrição                          |
-| ------ | -------------------------- | ---------------------------------- |
-| GET    | `/{recurso}/listar`        | Lista todos os registros.          |
-| GET    | `/{recurso}/cadastrar`     | Formulário de cadastro.            |
-| POST   | `/{recurso}/salvar`        | Cria o registro.                   |
-| GET    | `/{recurso}/editar/{id}`   | Formulário de edição.              |
-| POST   | `/{recurso}/editar`        | Atualiza o registro (senha opcional via `novoPassword`). |
-| GET    | `/{recurso}/excluir/{id}`  | Exclui o registro.                 |
-
-Onde `{recurso}` é `clientes`, `imobiliarias` ou `usuarios`.
-
-### 6.5. API REST (`/api/**`)
-
-Endpoints em
-[controller/api/](src/main/java/br/ufscar/dc/dsw/imobiliaria/controller/api/),
-liberados (`permitAll`) e com CORS habilitado. Respostas em JSON; listas vazias
-retornam **404**.
-
-**Imóveis — `/api/imoveis`** (somente leitura):
-
-| Método | Rota                          | Descrição                             |
-| ------ | ----------------------------- | ------------------------------------- |
-| GET    | `/api/imoveis`                | Lista todos os imóveis.               |
-| GET    | `/api/imoveis/{id}`           | Busca um imóvel por id.               |
-| GET    | `/api/imoveis/cidades/{nome}` | Imóveis de uma cidade (pelo nome).    |
-| GET    | `/api/imoveis/imobiliarias/{id}` | Imóveis de uma imobiliária.        |
-
-**Clientes — `/api/clientes`** e **Imobiliárias — `/api/imobiliarias`** (CRUD completo):
-
-| Método | Rota                      | Descrição                                  |
-| ------ | ------------------------- | ------------------------------------------ |
-| GET    | `/api/{recurso}`          | Lista todos.                               |
-| GET    | `/api/{recurso}/{id}`     | Busca por id.                              |
-| POST   | `/api/{recurso}`          | Cria (role definida automaticamente).      |
-| PUT    | `/api/{recurso}/{id}`     | Atualiza (campos enviados sobrescrevem).   |
-| DELETE | `/api/{recurso}/{id}`     | Remove (retorna 204).                      |
-
-Onde `{recurso}` é `clientes` ou `imobiliarias`.
-
-**Exemplos de uso (cURL):**
+### 6.3. Exemplos de uso (cURL)
 
 ```bash
 # Listar imóveis
@@ -294,10 +245,6 @@ curl -X PUT http://localhost:8080/api/imobiliarias/5 \
 # Remover um cliente (id 3)
 curl -X DELETE http://localhost:8080/api/clientes/3
 ```
-
-> Campos JSON aceitos:
-> - **Cliente:** `nome`, `email`, `password`, `CPF`, `sexo`, `telefone`, `dataNascimento` (`AAAA-MM-DD`).
-> - **Imobiliária:** `nome`, `email`, `password`, `CNPJ`, `descricao`.
 
 ---
 
